@@ -1,6 +1,5 @@
-{ "expected-missing-functions":
-  [
-  ],
+{
+  "expected-missing-functions": [],
   "proof-name": "preprocessBase64Index",
   "proof-root": "test/cbmc/proofs"
 }

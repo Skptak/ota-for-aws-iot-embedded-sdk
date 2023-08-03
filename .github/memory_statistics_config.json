@@ -13,7 +13,5 @@
     "source/dependency/coreJSON/source/include",
     "source/dependency/3rdparty/tinycbor/src"
   ],
-  "compiler_flags": [
-    "OTA_DO_NOT_USE_CUSTOM_CONFIG"
-  ]
+  "compiler_flags": ["OTA_DO_NOT_USE_CUSTOM_CONFIG"]
 }

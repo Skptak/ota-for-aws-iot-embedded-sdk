@@ -1,6 +1,5 @@
-{ "expected-missing-functions":
-  [
-  ],
+{
+  "expected-missing-functions": [],
   "proof-name": "<__FUNCTION_NAME__>",
   "proof-root": "<__PATH_TO_PROOF_ROOT__>"
 }

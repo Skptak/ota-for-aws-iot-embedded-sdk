@@ -1,6 +1,5 @@
-{ "expected-missing-functions":
-  [
-  ],
+{
+  "expected-missing-functions": [],
   "proof-name": "base64Decode",
   "proof-root": "test/cbmc/proofs"
 }

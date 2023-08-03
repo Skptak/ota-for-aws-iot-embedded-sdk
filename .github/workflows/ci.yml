@@ -144,12 +144,12 @@ jobs:
       - name: Install Python3
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11.0'
+          python-version: "3.11.0"
       - name: Measure sizes
         uses: Skptak/CI-CD-Github-Actions/memory_statistics@main
         with:
-            config: .github/memory_statistics_config.json
-            check_against: docs/doxygen/include/size_table.md
+          config: .github/memory_statistics_config.json
+          check_against: docs/doxygen/include/size_table.md
   proof_ci:
     if: ${{ github.event.pull_request }}
     runs-on: cbmc_ubuntu-latest_16-core

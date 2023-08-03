@@ -1,10 +1,12 @@
-name : "ota-for-aws-iot-embedded-sdk"
+name: "ota-for-aws-iot-embedded-sdk"
 version: "v3.4.0"
-description: "Client library for using the AWS Over-the-air Update service on embedded devices."
+description:
+  "Client library for using the AWS Over-the-air Update service on embedded
+  devices."
 license: "MIT"
 
 dependencies:
-  - name : "coreJSON"
+  - name: "coreJSON"
     version: "v3.2.0"
     license: "MIT"
     repository:
@@ -12,7 +14,7 @@ dependencies:
       url: "https://github.com/FreeRTOS/coreJSON.git"
       path: source/dependency/coreJSON
 
-  - name : "tinycbor"
+  - name: "tinycbor"
     version: "v0.5.4"
     license: "MIT"
     repository:
@@ -20,7 +22,7 @@ dependencies:
       url: "https://github.com/intel/tinycbor.git"
       path: source/dependency/3rdparty/tinycbor
 
-  - name : "CMock"
+  - name: "CMock"
     version: "v2.5.2"
     license: "MIT"
     repository:
@@ -28,7 +30,7 @@ dependencies:
       url: "https://github.com/ThrowTheSwitch/CMock.git"
       path: test/unit-test/CMock
 
-  - name : "FreeRTOS-Kernel"
+  - name: "FreeRTOS-Kernel"
     version: "V10.4.5"
     license: "MIT"
     repository:

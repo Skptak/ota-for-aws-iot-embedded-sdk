@@ -1,6 +1,5 @@
-{ "expected-missing-functions":
-  [
-  ],
+{
+  "expected-missing-functions": [],
   "proof-name": "OTA_CheckForUpdate",
   "proof-root": "test/cbmc/proofs"
 }
