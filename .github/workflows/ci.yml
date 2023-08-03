@@ -151,6 +151,7 @@ jobs:
             config: .github/memory_statistics_config.json
             check_against: docs/doxygen/include/size_table.md
   proof_ci:
+    if: ${{ github.event.pull_request }}
     runs-on: cbmc_ubuntu-latest_16-core
     steps:
       - name: Set up CBMC runner

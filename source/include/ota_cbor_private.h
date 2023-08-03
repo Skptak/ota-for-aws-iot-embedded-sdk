@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -32,7 +33,7 @@
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 /* *INDENT-ON* */
 
@@ -41,17 +42,17 @@
  * not part of the library interface but are included here for testability.
  */
 
-#define OTA_CBOR_CLIENTTOKEN_KEY          "c" /*!< Key for client id. */
-#define OTA_CBOR_FILEID_KEY               "f" /*!< Key for file id. */
-#define OTA_CBOR_BLOCKSIZE_KEY            "l" /*!< Key for file block size. */
-#define OTA_CBOR_BLOCKOFFSET_KEY          "o" /*!< Key for file block offset. */
-#define OTA_CBOR_BLOCKBITMAP_KEY          "b" /*!< Key for bitmap. */
-#define OTA_CBOR_STREAMDESCRIPTION_KEY    "d" /*!< Key for stream name. */
-#define OTA_CBOR_STREAMFILES_KEY          "r" /*!< Key for file attributes. */
-#define OTA_CBOR_FILESIZE_KEY             "z" /*!< Key for file size. */
-#define OTA_CBOR_BLOCKID_KEY              "i" /*!< Key for block id. */
-#define OTA_CBOR_BLOCKPAYLOAD_KEY         "p" /*!< Key for payload of a block. */
-#define OTA_CBOR_NUMBEROFBLOCKS_KEY       "n" /*!< Key for number of blocks. */
+#define OTA_CBOR_CLIENTTOKEN_KEY       "c" /*!< Key for client id. */
+#define OTA_CBOR_FILEID_KEY            "f" /*!< Key for file id. */
+#define OTA_CBOR_BLOCKSIZE_KEY         "l" /*!< Key for file block size. */
+#define OTA_CBOR_BLOCKOFFSET_KEY       "o" /*!< Key for file block offset. */
+#define OTA_CBOR_BLOCKBITMAP_KEY       "b" /*!< Key for bitmap. */
+#define OTA_CBOR_STREAMDESCRIPTION_KEY "d" /*!< Key for stream name. */
+#define OTA_CBOR_STREAMFILES_KEY       "r" /*!< Key for file attributes. */
+#define OTA_CBOR_FILESIZE_KEY          "z" /*!< Key for file size. */
+#define OTA_CBOR_BLOCKID_KEY           "i" /*!< Key for block id. */
+#define OTA_CBOR_BLOCKPAYLOAD_KEY      "p" /*!< Key for payload of a block. */
+#define OTA_CBOR_NUMBEROFBLOCKS_KEY    "n" /*!< Key for number of blocks. */
 
 /**
  * @brief Decode a Get Stream response message from AWS IoT OTA.
@@ -82,7 +83,7 @@ bool OTA_CBOR_Encode_GetStreamRequestMessage( uint8_t * pMessageBuffer,
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    }
+}
 #endif
 /* *INDENT-ON* */
 

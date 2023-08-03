@@ -4,27 +4,29 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
  * @file ota_http_interface.h
- * @brief Contains OTA HTTP Statuses, function type definitions and http interface structure.
+ * @brief Contains OTA HTTP Statuses, function type definitions and http
+ * interface structure.
  */
 
 #ifndef OTA_HTTP_INTERFACE_H
@@ -32,7 +34,7 @@
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 /* *INDENT-ON* */
 
@@ -87,9 +89,11 @@
 typedef enum OtaHttpStatus
 {
     OtaHttpSuccess = 0,       /*!< @brief OTA HTTP interface success. */
-    OtaHttpInitFailed = 0xc0, /*!< @brief Error initializing the HTTP connection. */
-    OtaHttpDeinitFailed,      /*!< @brief Error deinitializing the HTTP connection. */
-    OtaHttpRequestFailed      /*!< @brief Error sending the HTTP request. */
+    OtaHttpInitFailed = 0xc0, /*!< @brief Error initializing the HTTP
+                                 connection. */
+    OtaHttpDeinitFailed, /*!< @brief Error deinitializing the HTTP connection.
+                          */
+    OtaHttpRequestFailed /*!< @brief Error sending the HTTP request. */
 } OtaHttpStatus_t;
 
 /**
@@ -97,12 +101,13 @@ typedef enum OtaHttpStatus
  *
  * This function parses the pre-signed url and initializes connection.
  *
- * @param[in] pUrl         Pointer to the pre-signed url for downloading update file.
+ * @param[in] pUrl         Pointer to the pre-signed url for downloading update
+ * file.
  *
  * @return              OtaHttpSuccess if success , other error code on failure.
  */
 
-typedef OtaHttpStatus_t ( * OtaHttpInit_t ) ( char * pUrl );
+typedef OtaHttpStatus_t ( *OtaHttpInit_t )( char * pUrl );
 
 /**
  * @brief Request file block over Http.
@@ -116,8 +121,8 @@ typedef OtaHttpStatus_t ( * OtaHttpInit_t ) ( char * pUrl );
  * @return             OtaHttpSuccess if success , other error code on failure.
  */
 
-typedef OtaHttpStatus_t ( * OtaHttpRequest_t )  ( uint32_t rangeStart,
-                                                  uint32_t rangeEnd );
+typedef OtaHttpStatus_t ( *OtaHttpRequest_t )( uint32_t rangeStart,
+                                               uint32_t rangeEnd );
 
 /**
  * @brief Deinit OTA Http interface.
@@ -127,7 +132,7 @@ typedef OtaHttpStatus_t ( * OtaHttpRequest_t )  ( uint32_t rangeStart,
  *
  * @return        OtaHttpSuccess if success , other error code on failure.
  */
-typedef OtaHttpStatus_t ( * OtaHttpDeinit )( void );
+typedef OtaHttpStatus_t ( *OtaHttpDeinit )( void );
 
 /**
  * @ingroup ota_struct_types
@@ -143,7 +148,7 @@ typedef struct OtaHttpInterface
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    }
+}
 #endif
 /* *INDENT-ON* */
 

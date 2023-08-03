@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -28,8 +29,8 @@
  */
 /*  Ota Agent includes. */
 #include "ota.h"
-#include "stubs.h"
 #include "ota_interface_private.h"
+#include "stubs.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -49,8 +50,8 @@ void verifyActiveJobStatus_harness()
     size_t jobSize;
     uint16_t updateUrlMaxSize;
 
-    /* Havoc otaAgent and pFileContext to non-deterministically set all the bytes in
-     * the structure. */
+    /* Havoc otaAgent and pFileContext to non-deterministically set all the
+     * bytes in the structure. */
     __CPROVER_havoc_object( &otaAgent );
     __CPROVER_havoc_object( pFileContext );
 
@@ -58,15 +59,18 @@ void verifyActiveJobStatus_harness()
     __CPROVER_assume( pFileContext != NULL );
 
     /* Allocate memory to store the path of the url. */
-    otaAgent.fileContext.pUpdateUrlPath = ( uint8_t * ) malloc( sizeof( uint8_t ) * updateUrlMaxSize );
+    otaAgent.fileContext.pUpdateUrlPath = ( uint8_t * ) malloc(
+        sizeof( uint8_t ) * updateUrlMaxSize );
 
-    /* pJobName is used to store the name of the job and hence the size of the buffer cannot
-     * be greater than the size of otaAgent.activeJobName. */
-    pFileContext->pJobName = ( uint8_t * ) malloc( sizeof( uint8_t ) * OTA_JOB_ID_MAX_SIZE );
+    /* pJobName is used to store the name of the job and hence the size of the
+     * buffer cannot be greater than the size of otaAgent.activeJobName. */
+    pFileContext->pJobName = ( uint8_t * ) malloc( sizeof( uint8_t ) *
+                                                   OTA_JOB_ID_MAX_SIZE );
 
-    /* otaAgent.fileContext is passed as the fileContext to verifyActiveJobStatus and cannot
-     * have a NULL buffer. */
-    pFileContext->pUpdateUrlPath = ( uint8_t * ) malloc( sizeof( uint8_t ) * updateUrlMaxSize );
+    /* otaAgent.fileContext is passed as the fileContext to
+     * verifyActiveJobStatus and cannot have a NULL buffer. */
+    pFileContext->pUpdateUrlPath = ( uint8_t * ) malloc( sizeof( uint8_t ) *
+                                                         updateUrlMaxSize );
     __CPROVER_assume( pFileContext->pUpdateUrlPath != NULL );
 
     /* Initialize job name in filecontext. */
@@ -83,7 +87,8 @@ void verifyActiveJobStatus_harness()
         }
     }
 
-    /* To non-deterministically assume if the buffer is allocated by the user or by us. */
+    /* To non-deterministically assume if the buffer is allocated by the user or
+     * by us. */
     if( nondet_bool() )
     {
         otaAgent.fileContext.updateUrlMaxSize = 0u;
@@ -99,8 +104,9 @@ void verifyActiveJobStatus_harness()
     otaInterface.pal.abort = abortPalStub;
     otaDataInterface.cleanup = cleanupStub;
 
-    /* OtaInterfaces and the interfaces included in it cannot be NULL and they are checked
-     * during the initialization of OTA specifically in the OTA_Init function. */
+    /* OtaInterfaces and the interfaces included in it cannot be NULL and they
+     * are checked during the initialization of OTA specifically in the OTA_Init
+     * function. */
     otaAgent.pOtaInterface = &otaInterface;
 
     verifyActiveJobStatus( pFileContext, &finalFile, &pUpdateJob );

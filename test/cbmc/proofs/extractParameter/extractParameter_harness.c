@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -47,9 +48,12 @@ DocParseErr_t extractAndStoreArray( const char * pKey,
 {
     DocParseErr_t err;
 
-    __CPROVER_assert( pParamAdd != NULL, "Error: Expected a Non-Null value for pParam." );
-    __CPROVER_assert( pParamSizeAdd != NULL, "Error: Expected a Non-Null value for pParamSizeAdd." );
-    __CPROVER_assert( pValueInJson != NULL, "Error: Expected a Non-Null value for pValueInJson." );
+    __CPROVER_assert( pParamAdd != NULL,
+                      "Error: Expected a Non-Null value for pParam." );
+    __CPROVER_assert( pParamSizeAdd != NULL,
+                      "Error: Expected a Non-Null value for pParamSizeAdd." );
+    __CPROVER_assert( pValueInJson != NULL,
+                      "Error: Expected a Non-Null value for pValueInJson." );
 
     return err;
 }
@@ -60,8 +64,10 @@ DocParseErr_t decodeAndStoreKey( const char * pValueInJson,
 {
     DocParseErr_t err;
 
-    __CPROVER_assert( pValueInJson != NULL, "Error: Expected a Non-Null value for pValueInJson." );
-    __CPROVER_assert( pParamAdd != NULL, "Error: Expected a Non-Null value for pParam." );
+    __CPROVER_assert( pValueInJson != NULL,
+                      "Error: Expected a Non-Null value for pValueInJson." );
+    __CPROVER_assert( pParamAdd != NULL,
+                      "Error: Expected a Non-Null value for pParam." );
 
     return err;
 }
@@ -93,30 +99,34 @@ void extractParameter_harness()
      * the structure. */
     __CPROVER_havoc_object( &otaAgent );
 
-    /* The value of docParam is taken from the fields of otaJobDocModelParamStructure which is
-     * enforced in parseJSONbyModel. */
+    /* The value of docParam is taken from the fields of
+     * otaJobDocModelParamStructure which is enforced in parseJSONbyModel. */
     __CPROVER_assume( idx < OTA_NUM_JOB_PARAMS );
     docParam = otaJobDocModelParamStructure[ idx ];
 
     /* valueLength is the length of the parameter and thus cannot be NULL. */
     __CPROVER_assume( valueLength != 0 );
 
-    /* pValueInJson is a pointer to the parameter from the json string pJson in parseJSONbyModel
-     * function. */
+    /* pValueInJson is a pointer to the parameter from the json string pJson in
+     * parseJSONbyModel function. */
     pValueInJson = ( char * ) malloc( sizeof( char ) * valueLength );
     __CPROVER_assume( pValueInJson != NULL );
 
     memset( pValueInJson, 'a', valueLength );
     pValueInJson[ valueLength - 1 ] = '\0';
 
-    /* extractParameter is only called when the pDestOffset in the docParam is set to an offset
-     * other than OTA_DONT_STORE_PARAM and OTA_STORE_NESTED_JSON. */
-    __CPROVER_assume( ( docParam.pDestOffset != OTA_DONT_STORE_PARAM ) && ( docParam.pDestOffset != OTA_STORE_NESTED_JSON ) );
+    /* extractParameter is only called when the pDestOffset in the docParam is
+     * set to an offset other than OTA_DONT_STORE_PARAM and
+     * OTA_STORE_NESTED_JSON. */
+    __CPROVER_assume( ( docParam.pDestOffset != OTA_DONT_STORE_PARAM ) &&
+                      ( docParam.pDestOffset != OTA_STORE_NESTED_JSON ) );
 
-    /* pContextBase is a pointer to the otaAgent.fileContext which is statically initialized in ota.c */
+    /* pContextBase is a pointer to the otaAgent.fileContext which is statically
+     * initialized in ota.c */
     pContextBase = &fileContext;
 
-    ( void ) extractParameter( docParam, pContextBase, pValueInJson, valueLength );
+    ( void )
+        extractParameter( docParam, pContextBase, pValueInJson, valueLength );
 
     free( pValueInJson );
 }

@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -30,8 +31,7 @@
 #include "ota_mqtt_private.h"
 
 /* Maximum size of the pBuffer for initFileTransfer_Mqtt function. */
-#define TOPIC_STREAM_DATA_BUFFER_SIZE    96U
-
+#define TOPIC_STREAM_DATA_BUFFER_SIZE 96U
 
 /* Stub required to combine a set of strings(to form a topic). */
 size_t __CPROVER_file_local_ota_mqtt_c_stringBuilder( char * pBuffer,
@@ -48,7 +48,8 @@ size_t __CPROVER_file_local_ota_mqtt_c_stringBuilder( char * pBuffer,
 
     /* The size of the static pbuffer is declared inside initFileTransfer_Mqtt
      * function. */
-    __CPROVER_assume( stringLength > 0U && stringLength < TOPIC_STREAM_DATA_BUFFER_SIZE );
+    __CPROVER_assume( stringLength > 0U &&
+                      stringLength < TOPIC_STREAM_DATA_BUFFER_SIZE );
 
     return stringLength;
 }
@@ -80,6 +81,7 @@ void initFileTransfer_Mqtt_harness()
      * ready to be downloaded. Thus filecontext cannot be NULL. */
     agent.fileContext = filecontext;
 
-    /* OTA agent is defined as a global variable in ota.c and thus cannot be NULL.*/
+    /* OTA agent is defined as a global variable in ota.c and thus cannot be
+     * NULL.*/
     initFileTransfer_Mqtt( &agent );
 }

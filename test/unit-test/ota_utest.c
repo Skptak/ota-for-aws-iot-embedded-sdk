@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -28,98 +29,307 @@
  */
 
 /* Standard includes. */
-#include <stdlib.h>
-#include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* 3rdparty includes. */
-#include <unistd.h>
 #include "unity.h"
+#include <unistd.h>
 
 /* OTA includes. */
-#include "ota_appversion32.h"
 #include "ota.h"
-#include "ota_private.h"
-#include "ota_mqtt_private.h"
+#include "ota_appversion32.h"
 #include "ota_http_private.h"
 #include "ota_interface_private.h"
+#include "ota_mqtt_private.h"
+#include "ota_private.h"
 
 /* test includes. */
 #include "utest_helpers.h"
 
 /* Job document for testing. */
-#define OTA_FILE_SIZE_OVERFLOW            "4294963220"
-#define OTA_TEST_FILE_SIZE                10240
-#define OTA_TEST_FILE_NUM_BLOCKS          ( OTA_TEST_FILE_SIZE / OTA_FILE_BLOCK_SIZE + 1 )
-#define OTA_TEST_DUPLICATE_NUM_BLOCKS     3
-#define OTA_TEST_FILE_SIZE_STR            "10240"
-#define JOB_DOC_EMPTY                     "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143}"
-#define JOB_DOC_A                         "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_B                         "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob21\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_SELF_TEST                 "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"IN_PROGRESS\",\"statusDetails\":{\"self_test\":\"ready\",\"updatedBy\":\"0x1000000\"},\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_SELF_TEST_FILE_TYPE       "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"IN_PROGRESS\",\"statusDetails\":{\"self_test\":\"ready\",\"updatedBy\":\"0x1000000\"},\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"fileType\":255,\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_SELF_TEST_SAME_VERSION    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"IN_PROGRESS\",\"statusDetails\":{\"self_test\":\"ready\",\"updatedBy\":\"0x1000001\"},\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_SELF_TEST_DOWNGRADE       "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"IN_PROGRESS\",\"statusDetails\":{\"self_test\":\"ready\",\"updatedBy\":\"0x2000000\"},\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_HTTP                      "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob22\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"HTTP\"],\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"update_data_url\":\"https://dummy-url.com/ota.bin\",\"auth_scheme\":\"aws.s3.presigned\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_ONE_BLOCK                 "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob22\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"HTTP\"],\"files\":[{\"filepath\":\"/test/demo\",\"filesize\": \"1024\" ,\"fileid\":0,\"certfile\":\"test.crt\",\"update_data_url\":\"https://dummy-url.com/ota.bin\",\"auth_scheme\":\"aws.s3.presigned\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_INVALID                   "not a json"
-#define JOB_DOC_INVALID_PROTOCOL          "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"XYZ\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_INVALID_BASE64_KEY        "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"Zg===\"}] }}}}"
-#define JOB_DOC_MISSING_KEY               "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_INVALID_NUMBER_NAN        "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\": \"NaN\",\"fileid\":\"NaN\",\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_INVALID_NUMBER_VAL        "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\": 19223372036854775808,\"fileid\":\"NaN\",\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_SERVERFILE_ID             "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"IN_PROGRESS\",\"statusDetails\":{\"self_test\":\"ready\",\"updatedBy\":\"0x1000000\"},\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":1,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_MISSING_JOB_DOC           "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1}}"
-#define JOB_DOC_MISSING_JOB_ID            "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_INVALID_JOB_ID            "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"InvalidJobIdExceedingAllowedJobIdLengthInvalidJobIdExceedingAllowedJobIdLengthInvalidJobIdExceedingAllowedJobIdLength\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_DIFFERENT_FILE_TYPE       "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"fileType\":2,\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_FILESIZE_OVERFLOW         "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_FILE_SIZE_OVERFLOW ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
-#define JOB_DOC_INVALID_JOB_ID_LEN_MAX    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,\"execution\":{\"jobId\":\"InvalidJobIdExceedingAllowedJobIdLengthInvalidJobIdExceedingAllowedJobIdL\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"MEQCIF2QDvww1G/kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n6q7vrBg==\"}] }}}}"
+#define OTA_FILE_SIZE_OVERFLOW "4294963220"
+#define OTA_TEST_FILE_SIZE     10240
+#define OTA_TEST_FILE_NUM_BLOCKS \
+    ( OTA_TEST_FILE_SIZE / OTA_FILE_BLOCK_SIZE + 1 )
+#define OTA_TEST_DUPLICATE_NUM_BLOCKS 3
+#define OTA_TEST_FILE_SIZE_STR        "10240"
+#define JOB_DOC_EMPTY \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143}"
+#define JOB_DOC_A                                                              \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\","    \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/"    \
+    "test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR                         \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"            \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_B                                                              \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob21\",\"status\":\"QUEUED\","    \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/"    \
+    "test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR                         \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"            \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_SELF_TEST                                                      \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"IN_"          \
+    "PROGRESS\",\"statusDetails\":{\"self_test\":\"ready\",\"updatedBy\":"     \
+    "\"0x1000000\"},\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,"     \
+    "\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{" \
+    "\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{"     \
+    "\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR         \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"            \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_SELF_TEST_FILE_TYPE                                            \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"IN_"          \
+    "PROGRESS\",\"statusDetails\":{\"self_test\":\"ready\",\"updatedBy\":"     \
+    "\"0x1000000\"},\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,"     \
+    "\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{" \
+    "\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{"     \
+    "\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR         \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"fileType\":255,\"sig-sha256-"   \
+    "ecdsa\":\"MEQCIF2QDvww1G/"                                                \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_SELF_TEST_SAME_VERSION                                         \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"IN_"          \
+    "PROGRESS\",\"statusDetails\":{\"self_test\":\"ready\",\"updatedBy\":"     \
+    "\"0x1000001\"},\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,"     \
+    "\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{" \
+    "\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{"     \
+    "\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR         \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"            \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_SELF_TEST_DOWNGRADE                                            \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"IN_"          \
+    "PROGRESS\",\"statusDetails\":{\"self_test\":\"ready\",\"updatedBy\":"     \
+    "\"0x2000000\"},\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,"     \
+    "\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{" \
+    "\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{"     \
+    "\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR         \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"            \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_HTTP                                                           \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob22\",\"status\":\"QUEUED\","    \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"HTTP\"],\"files\":[{\"filepath\":\"/test/"                              \
+    "demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR                              \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"update_data_url\":\"https://"   \
+    "dummy-url.com/"                                                           \
+    "ota.bin\",\"auth_scheme\":\"aws.s3.presigned\",\"sig-sha256-ecdsa\":"     \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_ONE_BLOCK                                                      \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob22\",\"status\":\"QUEUED\","    \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"HTTP\"],\"files\":[{\"filepath\":\"/test/demo\",\"filesize\": "         \
+    "\"1024\" "                                                                \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"update_data_url\":\"https://"   \
+    "dummy-url.com/"                                                           \
+    "ota.bin\",\"auth_scheme\":\"aws.s3.presigned\",\"sig-sha256-ecdsa\":"     \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_INVALID "not a json"
+#define JOB_DOC_INVALID_PROTOCOL                                               \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\","    \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"XYZ\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/"     \
+    "test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR                         \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"            \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_INVALID_BASE64_KEY                                             \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\","    \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/"    \
+    "test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR                         \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":\"Zg===\"}]" \
+    " }}}}"
+#define JOB_DOC_MISSING_KEY                                                    \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\","    \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/"    \
+    "test/"                                                                    \
+    "demo\",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"      \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_INVALID_NUMBER_NAN                                             \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\","    \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/"    \
+    "test/demo\",\"filesize\": "                                               \
+    "\"NaN\",\"fileid\":\"NaN\",\"certfile\":\"test.crt\",\"sig-sha256-"       \
+    "ecdsa\":\"MEQCIF2QDvww1G/"                                                \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_INVALID_NUMBER_VAL                                             \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\","    \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/"    \
+    "test/demo\",\"filesize\": "                                               \
+    "19223372036854775808,\"fileid\":\"NaN\",\"certfile\":\"test.crt\",\"sig-" \
+    "sha256-ecdsa\":\"MEQCIF2QDvww1G/"                                         \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_SERVERFILE_ID                                                  \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"IN_"          \
+    "PROGRESS\",\"statusDetails\":{\"self_test\":\"ready\",\"updatedBy\":"     \
+    "\"0x1000000\"},\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,"     \
+    "\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{" \
+    "\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{"     \
+    "\"filepath\":\"/test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR         \
+    ",\"fileid\":1,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"            \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_MISSING_JOB_DOC                                               \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"             \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\","   \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":" \
+    "1,\"executionNumber\":1}}"
+#define JOB_DOC_MISSING_JOB_ID                                                 \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"status\":\"QUEUED\",\"queuedAt\":1602795128,"            \
+    "\"lastUpdatedAt\":1602795128,\"versionNumber\":1,\"executionNumber\":1,"  \
+    "\"jobDocument\":{\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":"   \
+    "\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/test/"                        \
+    "demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR                              \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"            \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_INVALID_JOB_ID                                                 \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":"                                                \
+    "\"InvalidJobIdExceedingAllowedJobIdLengthInvalidJobIdExceedingAllowedJob" \
+    "IdLengthInvalidJobIdExceedingAllowedJobIdLength\",\"status\":\"QUEUED\"," \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/"    \
+    "test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR                         \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"            \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_DIFFERENT_FILE_TYPE                                            \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\","    \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/"    \
+    "test/demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR                         \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"fileType\":2,\"sig-sha256-"     \
+    "ecdsa\":\"MEQCIF2QDvww1G/"                                                \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_FILESIZE_OVERFLOW                                              \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":\"AFR_OTA-testjob20\",\"status\":\"QUEUED\","    \
+    "\"queuedAt\":1602795128,\"lastUpdatedAt\":1602795128,\"versionNumber\":"  \
+    "1,\"executionNumber\":1,\"jobDocument\":{\"afr_ota\":{\"protocols\":["    \
+    "\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\",\"files\":[{\"filepath\":\"/"    \
+    "test/demo\",\"filesize\":" OTA_FILE_SIZE_OVERFLOW                         \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"            \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
+#define JOB_DOC_INVALID_JOB_ID_LEN_MAX                                         \
+    "{\"clientToken\":\"0:testclient\",\"timestamp\":1602795143,"              \
+    "\"execution\":{\"jobId\":"                                                \
+    "\"InvalidJobIdExceedingAllowedJobIdLengthInvalidJobIdExceedingAllowedJob" \
+    "IdL\",\"status\":\"QUEUED\",\"queuedAt\":1602795128,\"lastUpdatedAt\":"   \
+    "1602795128,\"versionNumber\":1,\"executionNumber\":1,\"jobDocument\":{"   \
+    "\"afr_ota\":{\"protocols\":[\"MQTT\"],\"streamname\":\"AFR_OTA-XYZ\","    \
+    "\"files\":[{\"filepath\":\"/test/"                                        \
+    "demo\",\"filesize\":" OTA_TEST_FILE_SIZE_STR                              \
+    ",\"fileid\":0,\"certfile\":\"test.crt\",\"sig-sha256-ecdsa\":"            \
+    "\"MEQCIF2QDvww1G/"                                                        \
+    "kpRGZ8FYvQrok1bSZvXjXefRk7sqNcyPTAiB4dvGt8fozIY5NC0vUDJ2MY42ZERYEcrbwA4n" \
+    "6q7vrBg==\"}] }}}}"
 
 /* OTA application buffer size. */
-#define OTA_UPDATE_FILE_PATH_SIZE         100
-#define OTA_CERT_FILE_PATH_SIZE           100
-#define OTA_STREAM_NAME_SIZE              50
-#define OTA_INVALID_STREAM_NAME_SIZE      5 /* Size insufficient to hold stream name used in the default job document (AFR_OTA-testjob20). */
-#define OTA_DECODE_MEMORY_SIZE            OTA_FILE_BLOCK_SIZE
-#define OTA_FILE_BITMAP_SIZE              50
-#define OTA_UPDATE_URL_SIZE               100
-#define OTA_AUTH_SCHEME_SIZE              50
-#define OTA_APP_BUFFER_SIZE       \
-    ( OTA_UPDATE_FILE_PATH_SIZE + \
-      OTA_CERT_FILE_PATH_SIZE +   \
-      OTA_STREAM_NAME_SIZE +      \
-      OTA_DECODE_MEMORY_SIZE +    \
-      OTA_FILE_BITMAP_SIZE +      \
-      OTA_UPDATE_URL_SIZE +       \
-      OTA_AUTH_SCHEME_SIZE )
+#define OTA_UPDATE_FILE_PATH_SIZE 100
+#define OTA_CERT_FILE_PATH_SIZE   100
+#define OTA_STREAM_NAME_SIZE      50
+#define OTA_INVALID_STREAM_NAME_SIZE                                   \
+    5 /* Size insufficient to hold stream name used in the default job \
+         document (AFR_OTA-testjob20). */
+#define OTA_DECODE_MEMORY_SIZE OTA_FILE_BLOCK_SIZE
+#define OTA_FILE_BITMAP_SIZE   50
+#define OTA_UPDATE_URL_SIZE    100
+#define OTA_AUTH_SCHEME_SIZE   50
+#define OTA_APP_BUFFER_SIZE                                                  \
+    ( OTA_UPDATE_FILE_PATH_SIZE + OTA_CERT_FILE_PATH_SIZE +                  \
+      OTA_STREAM_NAME_SIZE + OTA_DECODE_MEMORY_SIZE + OTA_FILE_BITMAP_SIZE + \
+      OTA_UPDATE_URL_SIZE + OTA_AUTH_SCHEME_SIZE )
 
-#define min( x, y )    ( x < y ? x : y )
+#define min( x, y )                ( x < y ? x : y )
 
-#define OTA_NUM_MSG_Q_ENTRIES    20
+#define OTA_NUM_MSG_Q_ENTRIES      20
 
 /**
  * @brief Offset helper.
  */
-#define U16_OFFSET( type, member )    ( ( uint16_t ) offsetof( type, member ) )
+#define U16_OFFSET( type, member ) ( ( uint16_t ) offsetof( type, member ) )
 
 /* Firmware version. */
-const AppVersion32_t appFirmwareVersion =
-{
+const AppVersion32_t appFirmwareVersion = {
     .u.x.major = 1,
     .u.x.minor = 0,
     .u.x.build = 1,
 };
 
 /* OTA code signing signature algorithm. */
-const char OTA_JsonFileSignatureKey[ OTA_FILE_SIG_KEY_STR_MAX_LENGTH ] = "sig-sha256-ecdsa";
+const char
+    OTA_JsonFileSignatureKey[ OTA_FILE_SIG_KEY_STR_MAX_LENGTH ] = "sig-sha256-"
+                                                                  "ecdsa";
 
 /* OTA client name. */
 static const char * pOtaDefaultClientId = "ota_utest";
 
 /* Longest supported OTA Thingname*/
-static const char * longestThingname = "AReallyLongThingNameWhichIs128CharactersAndMatchesTheAWSIoTSpecificationForThingnameLengthMaximums12345678901234567890123456789";
+static const char * longestThingname = "AReallyLongThingNameWhichIs128Character"
+                                       "sAndMatchesTheAWSIoTSpecificationForThi"
+                                       "ngnameLengthMaximums1234567890123456789"
+                                       "0123456789";
 /* OTA job doc. */
 static const char * pOtaJobDoc = NULL;
 
@@ -150,7 +360,8 @@ static const int otaDefaultWait = 0;
 /* Flag to unsubscribe to topics after ota shutdown. */
 static const uint8_t unsubscribeFlag = 1;
 
-/* Larger job name buffer to simulate if local buffer is larger than buffer in agent context. */
+/* Larger job name buffer to simulate if local buffer is larger than buffer in
+ * agent context. */
 static uint8_t pLargerJobNameBuffer[ OTA_JOB_ID_MAX_SIZE * 2 ];
 
 /* A counter to record how many file blocks are received. */
@@ -211,8 +422,7 @@ extern DocParseErr_t parseJobDoc( const JsonDocParam_t * pJsonDoc,
                                   bool * pUpdateJob,
                                   OtaFileContext_t ** pFileContext );
 
-extern DocParseErr_t validateJSON( const char * pJson,
-                                   uint32_t messageLength );
+extern DocParseErr_t validateJSON( const char * pJson, uint32_t messageLength );
 
 extern IngestResult_t ingestDataBlockCleanup( OtaFileContext_t * pFileContext,
                                               OtaPalStatus_t * pCloseResult );
@@ -241,8 +451,8 @@ static OtaOsStatus_t mockOSEventReset( OtaEventContext_t * unused )
     return OtaOsSuccess;
 }
 
-/* Allow an event to be sent only once, after that ignore all incoming event. Useful to make sure
- * internal OTA handler are not able to send any event. */
+/* Allow an event to be sent only once, after that ignore all incoming event.
+ * Useful to make sure internal OTA handler are not able to send any event. */
 static OtaOsStatus_t mockOSEventSendThenStop( OtaEventContext_t * unused_1,
                                               const void * pEventMsg,
                                               uint32_t unused_2 )
@@ -269,7 +479,8 @@ static OtaOsStatus_t mockOSEventSendThenStop( OtaEventContext_t * unused_1,
     return OtaOsSuccess;
 }
 
-/* A variant of mockOSEventSendThenStop, but return failure after first event sent. */
+/* A variant of mockOSEventSendThenStop, but return failure after first event
+ * sent. */
 static OtaOsStatus_t mockOSEventSendThenFail( OtaEventContext_t * unused_1,
                                               const void * pEventMsg,
                                               uint32_t unused_2 )
@@ -340,7 +551,9 @@ static OtaOsStatus_t mockOSEventReceive( OtaEventContext_t * unused_1,
     {
         pOtaEvent->eventId = otaEventQueue[ 0 ].eventId;
         pOtaEvent->pEventData = otaEventQueue[ 0 ].pEventData;
-        memmove( otaEventQueue, otaEventQueue + 1, sizeof( OtaEventMsg_t ) * ( currQueueSize - 1 ) );
+        memmove( otaEventQueue,
+                 otaEventQueue + 1,
+                 sizeof( OtaEventMsg_t ) * ( currQueueSize - 1 ) );
         otaEventQueueEnd--;
     }
     else
@@ -469,11 +682,12 @@ static OtaMqttStatus_t stubMqttPublish( const char * const unused_1,
     return OtaMqttSuccess;
 }
 
-static OtaMqttStatus_t stubMqttPublishOnlySuccedsTopicIsCorrect( const char * const topic,
-                                                                 uint16_t topicLength,
-                                                                 const char * unused_1,
-                                                                 uint32_t unused_2,
-                                                                 uint8_t unused_3 )
+static OtaMqttStatus_t stubMqttPublishOnlySuccedsTopicIsCorrect(
+    const char * const topic,
+    uint16_t topicLength,
+    const char * unused_1,
+    uint32_t unused_2,
+    uint8_t unused_3 )
 {
     ( void ) unused_1;
     ( void ) unused_2;
@@ -494,17 +708,19 @@ static OtaMqttStatus_t stubMqttPublishOnlySuccedsTopicIsCorrect( const char * co
     return OtaMqttSuccess;
 }
 
-static OtaMqttStatus_t stubMqttPublishOnlySuccedsIfTruncatedValue( const char * const unused_1,
-                                                                   uint16_t unused_2,
-                                                                   const char * msg,
-                                                                   uint32_t msgSize,
-                                                                   uint8_t unused_3 )
+static OtaMqttStatus_t stubMqttPublishOnlySuccedsIfTruncatedValue(
+    const char * const unused_1,
+    uint16_t unused_2,
+    const char * msg,
+    uint32_t msgSize,
+    uint8_t unused_3 )
 {
     ( void ) unused_1;
     ( void ) unused_2;
     ( void ) unused_3;
 
-    /* Maximum message size is 64 characters for client token + 19 characters for JSON formatting */
+    /* Maximum message size is 64 characters for client token + 19 characters
+     * for JSON formatting */
     TEST_ASSERT_LESS_OR_EQUAL( 83U, msgSize );
     TEST_ASSERT_GREATER_THAN( 19U, msgSize );
 
@@ -530,11 +746,12 @@ static OtaMqttStatus_t stubMqttPublishOnlySuccedsIfTruncatedValue( const char * 
     return OtaMqttSuccess;
 }
 
-static OtaMqttStatus_t stubMqttPublishZeroBlocksReceived( const char * const unused_1,
-                                                          uint16_t unused_2,
-                                                          const char * msg,
-                                                          uint32_t msgSize,
-                                                          uint8_t unused_3 )
+static OtaMqttStatus_t stubMqttPublishZeroBlocksReceived(
+    const char * const unused_1,
+    uint16_t unused_2,
+    const char * msg,
+    uint32_t msgSize,
+    uint8_t unused_3 )
 {
     ( void ) unused_1;
     ( void ) unused_2;
@@ -547,22 +764,26 @@ static OtaMqttStatus_t stubMqttPublishZeroBlocksReceived( const char * const unu
 
     memcpy( actual, msg, 18U );
 
-    TEST_ASSERT_EQUAL_STRING( "{\"status\":\"IN_PROGRESS\",\"statusDetails\":{\"receive\":\"0/2\"}}", actual );
+    TEST_ASSERT_EQUAL_STRING( "{\"status\":\"IN_PROGRESS\",\"statusDetails\":{"
+                              "\"receive\":\"0/2\"}}",
+                              actual );
 
     return OtaMqttSuccess;
 }
 
-OtaErr_t mockControlInterfaceRequestJobAlwaysFail( const OtaAgentContext_t * unused )
+OtaErr_t mockControlInterfaceRequestJobAlwaysFail(
+    const OtaAgentContext_t * unused )
 {
     ( void ) unused;
 
     return OtaErrRequestJobFailed;
 }
 
-OtaErr_t mockControlInterfaceUpdateJobAlwaysFail( const OtaAgentContext_t * unused1,
-                                                  OtaJobStatus_t unused2,
-                                                  int32_t unused3,
-                                                  int32_t unused4 )
+OtaErr_t mockControlInterfaceUpdateJobAlwaysFail(
+    const OtaAgentContext_t * unused1,
+    OtaJobStatus_t unused2,
+    int32_t unused3,
+    int32_t unused4 )
 {
     ( void ) unused1;
     ( void ) unused2;
@@ -589,15 +810,16 @@ OtaErr_t mockControlInterfaceUpdateJobCount( const OtaAgentContext_t * unused1,
     return OtaErrNone;
 }
 
-OtaErr_t mockDataInterfaceInitFileTransferAlwaysFail( const OtaAgentContext_t * unused )
+OtaErr_t mockDataInterfaceInitFileTransferAlwaysFail(
+    const OtaAgentContext_t * unused )
 {
     ( void ) unused;
 
     return OtaErrInitFileTransferFailed;
 }
 
-
-OtaErr_t mockDataInitFileTransferAlwaysSucceed( const OtaAgentContext_t * unused )
+OtaErr_t mockDataInitFileTransferAlwaysSucceed(
+    const OtaAgentContext_t * unused )
 {
     ( void ) unused;
 
@@ -654,8 +876,7 @@ static OtaHttpStatus_t mockHttpInitAlwaysFail( char * url )
     return OtaHttpInitFailed;
 }
 
-static OtaHttpStatus_t stubHttpRequest( uint32_t rangeStart,
-                                        uint32_t rangeEnd )
+static OtaHttpStatus_t stubHttpRequest( uint32_t rangeStart, uint32_t rangeEnd )
 {
     ( void ) rangeEnd;
     ( void ) rangeStart;
@@ -695,18 +916,19 @@ OtaPalStatus_t mockPalCreateFileForRx( OtaFileContext_t * const pFileContext )
     return OTA_PAL_COMBINE_ERR( OtaPalSuccess, 0 );
 }
 
-OtaPalStatus_t mockPalCreateNullFileForRx( OtaFileContext_t * const pFileContext )
+OtaPalStatus_t mockPalCreateNullFileForRx(
+    OtaFileContext_t * const pFileContext )
 {
     pFileContext->pFile = NULL;
     return OTA_PAL_COMBINE_ERR( OtaPalSuccess, 0 );
 }
 
-OtaPalStatus_t mockPalCreateFileForRxAlwaysFail( OtaFileContext_t * const pFileContext )
+OtaPalStatus_t mockPalCreateFileForRxAlwaysFail(
+    OtaFileContext_t * const pFileContext )
 {
     ( void ) pFileContext;
     return OTA_PAL_COMBINE_ERR( OtaPalRxFileCreateFailed, 0 );
 }
-
 
 OtaPalStatus_t mockPalCloseFile( OtaFileContext_t * const pFileContext )
 {
@@ -714,13 +936,15 @@ OtaPalStatus_t mockPalCloseFile( OtaFileContext_t * const pFileContext )
     return OTA_PAL_COMBINE_ERR( OtaPalSuccess, 0 );
 }
 
-OtaPalStatus_t mockPalCloseFileAlwaysFail( OtaFileContext_t * const pFileContext )
+OtaPalStatus_t mockPalCloseFileAlwaysFail(
+    OtaFileContext_t * const pFileContext )
 {
     ( void ) pFileContext;
     return OTA_PAL_COMBINE_ERR( OtaPalFileClose, 0 );
 }
 
-OtaPalStatus_t mockPalCloseFileSigCheckFail( OtaFileContext_t * const pFileContext )
+OtaPalStatus_t mockPalCloseFileSigCheckFail(
+    OtaFileContext_t * const pFileContext )
 {
     ( void ) pFileContext;
     return OTA_PAL_COMBINE_ERR( OtaPalSignatureCheckFailed, 0 );
@@ -735,7 +959,8 @@ int16_t mockPalWriteBlock( OtaFileContext_t * const pFileContext,
 
     if( offset >= OTA_TEST_FILE_SIZE )
     {
-        TEST_ASSERT_TRUE_MESSAGE( false, "Offset is bigger than test file buffer." );
+        TEST_ASSERT_TRUE_MESSAGE( false,
+                                  "Offset is bigger than test file buffer." );
     }
 
     memcpy( pOtaFileBuffer + offset, pData, blockSize );
@@ -787,8 +1012,9 @@ OtaPalStatus_t mockPalResetDevice( OtaFileContext_t * const pFileContext )
     return OTA_PAL_COMBINE_ERR( OtaPalSuccess, 0 );
 }
 
-OtaPalStatus_t mockPalSetPlatformImageState( OtaFileContext_t * const pFileContext,
-                                             OtaImageState_t eState )
+OtaPalStatus_t mockPalSetPlatformImageState(
+    OtaFileContext_t * const pFileContext,
+    OtaImageState_t eState )
 {
     ( void ) pFileContext;
 
@@ -810,34 +1036,37 @@ OtaPalStatus_t mockPalSetPlatformImageState( OtaFileContext_t * const pFileConte
     return OTA_PAL_COMBINE_ERR( OtaPalSuccess, 0 );
 }
 
-OtaPalStatus_t mockPalSetPlatformImageStateAlwaysFail( OtaFileContext_t * const pFileContext,
-                                                       OtaImageState_t eState )
+OtaPalStatus_t mockPalSetPlatformImageStateAlwaysFail(
+    OtaFileContext_t * const pFileContext,
+    OtaImageState_t eState )
 {
     ( void ) pFileContext;
     ( void ) eState;
     return OTA_PAL_COMBINE_ERR( OtaPalBadImageState, 0 );
 }
 
-OtaPalImageState_t mockPalGetPlatformImageState( OtaFileContext_t * const pFileContext )
+OtaPalImageState_t mockPalGetPlatformImageState(
+    OtaFileContext_t * const pFileContext )
 {
     ( void ) pFileContext;
     return palImageState;
 }
 
-OtaPalImageState_t mockPalGetPlatformImageStateAlwaysInvalid( OtaFileContext_t * const pFileContext )
+OtaPalImageState_t mockPalGetPlatformImageStateAlwaysInvalid(
+    OtaFileContext_t * const pFileContext )
 {
     ( void ) pFileContext;
     return OtaPalImageStateInvalid;
 }
 
-OtaPalImageState_t mockPalGetPlatformImageStateAlwaysPendingCommit( OtaFileContext_t * const pFileContext )
+OtaPalImageState_t mockPalGetPlatformImageStateAlwaysPendingCommit(
+    OtaFileContext_t * const pFileContext )
 {
     ( void ) pFileContext;
     return OtaPalImageStatePendingCommit;
 }
 
-static void mockAppCallback( OtaJobEvent_t event,
-                             void * pData )
+static void mockAppCallback( OtaJobEvent_t event, void * pData )
 {
     OtaJobDocument_t * jobDoc = NULL;
 
@@ -874,8 +1103,9 @@ static void mockAppCallbackCustomParsingFails( OtaJobEvent_t event,
     }
 }
 
-/* Set default OTA OS interface to mockOSEventSendThenStop. This allows us to easily control the
- * state machine transition by blocking any event in OTA internal handlers. */
+/* Set default OTA OS interface to mockOSEventSendThenStop. This allows us to
+ * easily control the state machine transition by blocking any event in OTA
+ * internal handlers. */
 static void otaInterfaceDefault()
 {
     otaInterfaces.os.event.init = mockOSEventReset;
@@ -912,15 +1142,20 @@ static void otaAppBufferDefault()
 {
     pOtaAppBuffer.pUpdateFilePath = pUserBuffer;
     pOtaAppBuffer.updateFilePathsize = OTA_UPDATE_FILE_PATH_SIZE;
-    pOtaAppBuffer.pCertFilePath = pOtaAppBuffer.pUpdateFilePath + pOtaAppBuffer.updateFilePathsize;
+    pOtaAppBuffer.pCertFilePath = pOtaAppBuffer.pUpdateFilePath +
+                                  pOtaAppBuffer.updateFilePathsize;
     pOtaAppBuffer.certFilePathSize = OTA_CERT_FILE_PATH_SIZE;
-    pOtaAppBuffer.pStreamName = pOtaAppBuffer.pCertFilePath + pOtaAppBuffer.certFilePathSize;
+    pOtaAppBuffer.pStreamName = pOtaAppBuffer.pCertFilePath +
+                                pOtaAppBuffer.certFilePathSize;
     pOtaAppBuffer.streamNameSize = OTA_STREAM_NAME_SIZE;
-    pOtaAppBuffer.pDecodeMemory = pOtaAppBuffer.pStreamName + pOtaAppBuffer.streamNameSize;
+    pOtaAppBuffer.pDecodeMemory = pOtaAppBuffer.pStreamName +
+                                  pOtaAppBuffer.streamNameSize;
     pOtaAppBuffer.decodeMemorySize = OTA_DECODE_MEMORY_SIZE;
-    pOtaAppBuffer.pFileBitmap = pOtaAppBuffer.pDecodeMemory + pOtaAppBuffer.decodeMemorySize;
+    pOtaAppBuffer.pFileBitmap = pOtaAppBuffer.pDecodeMemory +
+                                pOtaAppBuffer.decodeMemorySize;
     pOtaAppBuffer.fileBitmapSize = OTA_FILE_BITMAP_SIZE;
-    pOtaAppBuffer.pUrl = pOtaAppBuffer.pStreamName + pOtaAppBuffer.streamNameSize;
+    pOtaAppBuffer.pUrl = pOtaAppBuffer.pStreamName +
+                         pOtaAppBuffer.streamNameSize;
     pOtaAppBuffer.urlSize = OTA_UPDATE_URL_SIZE;
     pOtaAppBuffer.pAuthScheme = pOtaAppBuffer.pUrl + pOtaAppBuffer.urlSize;
     pOtaAppBuffer.authSchemeSize = OTA_AUTH_SCHEME_SIZE;
@@ -940,8 +1175,7 @@ static void processEntireQueue()
     }
 }
 
-static void otaInit( const char * pClientID,
-                     OtaAppCallback_t appCallback )
+static void otaInit( const char * pClientID, OtaAppCallback_t appCallback )
 {
     OTA_Init( &pOtaAppBuffer,
               &otaInterfaces,
@@ -967,7 +1201,8 @@ static void otaReceiveJobDocument()
     size_t job_doc_len = strlen( pOtaJobDoc );
     OtaEventMsg_t otaEvent = { 0 };
 
-    /* Parse success would create the file, let it invoke our mock when creating file. */
+    /* Parse success would create the file, let it invoke our mock when creating
+     * file. */
     otaEvent.eventId = OtaAgentEventReceivedJobDocument;
     otaEvent.pEventData = &eventBuffer;
     memcpy( otaEvent.pEventData->data, pOtaJobDoc, job_doc_len );
@@ -1001,8 +1236,8 @@ static void otaGoToState( OtaState_t state )
     {
         case OtaAgentStateInit:
 
-            /* Nothing needs to be done here since we should either be in init state already or
-             * we are in other running states. */
+            /* Nothing needs to be done here since we should either be in init
+             * state already or we are in other running states. */
             break;
 
         case OtaAgentStateReady:
@@ -1107,14 +1342,16 @@ void test_OTA_InitWhenReady()
 
 void test_OTA_InitWithNullName()
 {
-    /* Explicitly test NULL client name. OTA agent should remain in stopped state. */
+    /* Explicitly test NULL client name. OTA agent should remain in stopped
+     * state. */
     otaInit( NULL, mockAppCallback );
     TEST_ASSERT_EQUAL( OtaAgentStateStopped, OTA_GetState() );
 }
 
 void test_OTA_InitWithNameAtMaxLength()
 {
-    /* OTA does not accept name longer than 128. Explicitly test long client name. */
+    /* OTA does not accept name longer than 128. Explicitly test long client
+     * name. */
     char long_name[ 129 ] = { 0 };
 
     memset( long_name, 1, sizeof( long_name ) - 1 );
@@ -1124,7 +1361,8 @@ void test_OTA_InitWithNameAtMaxLength()
 
 void test_OTA_InitWithNameTooLong()
 {
-    /* OTA does not accept name longer than 128. Explicitly test long client name. */
+    /* OTA does not accept name longer than 128. Explicitly test long client
+     * name. */
     char long_name[ 130 ] = { 0 };
 
     memset( long_name, 1, sizeof( long_name ) - 1 );
@@ -1255,10 +1493,12 @@ void test_OTA_StartFailedWhenReady()
     otaGoToState( OtaAgentStateReady );
     TEST_ASSERT_EQUAL( OtaAgentStateReady, OTA_GetState() );
 
-    /* Set the event send interface to a mock function that fails after first event sent. */
+    /* Set the event send interface to a mock function that fails after first
+     * event sent. */
     otaInterfaces.os.event.send = mockOSEventSendThenFail;
 
-    /* The event handler should fail, so OTA agent should remain in OtaAgentStateReady state. */
+    /* The event handler should fail, so OTA agent should remain in
+     * OtaAgentStateReady state. */
     otaEvent.eventId = OtaAgentEventStart;
     OTA_SignalEvent( &otaEvent );
     receiveAndProcessOtaEvent();
@@ -1321,8 +1561,8 @@ void test_OTA_ResumeWhenReady()
     otaGoToState( OtaAgentStateReady );
     TEST_ASSERT_EQUAL( OtaAgentStateReady, OTA_GetState() );
 
-    /* Calling resume when OTA agent is not suspend state. This should be an unexpected event and
-     * the agent should remain in ready state. */
+    /* Calling resume when OTA agent is not suspend state. This should be an
+     * unexpected event and the agent should remain in ready state. */
     TEST_ASSERT_EQUAL( OtaErrNone, OTA_Resume() );
     receiveAndProcessOtaEvent();
     TEST_ASSERT_EQUAL( OtaAgentStateReady, OTA_GetState() );
@@ -1346,7 +1586,8 @@ void test_OTA_ResumeSelfTestTimerRestart()
     otaGoToState( OtaAgentStateSuspended );
     TEST_ASSERT_EQUAL( OtaAgentStateSuspended, OTA_GetState() );
 
-    /* Reset timer state and configure mocked timer function for tracking timer state */
+    /* Reset timer state and configure mocked timer function for tracking timer
+     * state */
     bSelfTestTimerIsActive = false;
     bRequestTimerIsActive = false;
     otaInterfaces.os.timer.start = mockOSTimerStart;
@@ -1354,7 +1595,8 @@ void test_OTA_ResumeSelfTestTimerRestart()
     otaInterfaces.os.event.send = mockOSEventSend;
 
     /* Let the PAL always says it's in self test. */
-    otaInterfaces.pal.getPlatformImageState = mockPalGetPlatformImageStateAlwaysPendingCommit;
+    otaInterfaces.pal
+        .getPlatformImageState = mockPalGetPlatformImageStateAlwaysPendingCommit;
     TEST_ASSERT_EQUAL( OtaErrNone, OTA_Resume() );
 
     /* Self test timer should be restarted if the device is self testing. */
@@ -1371,7 +1613,8 @@ void test_OTA_ResumeNoSelfTestTimerRestart()
     otaGoToState( OtaAgentStateSuspended );
     TEST_ASSERT_EQUAL( OtaAgentStateSuspended, OTA_GetState() );
 
-    /* Reset timer state and configure mocked timer function for tracking timer state */
+    /* Reset timer state and configure mocked timer function for tracking timer
+     * state */
     bSelfTestTimerIsActive = false;
     bRequestTimerIsActive = false;
     otaInterfaces.os.timer.start = mockOSTimerStart;
@@ -1379,10 +1622,12 @@ void test_OTA_ResumeNoSelfTestTimerRestart()
     otaInterfaces.os.event.send = mockOSEventSend;
 
     /* Let the PAL always says it's not in self test. */
-    otaInterfaces.pal.getPlatformImageState = mockPalGetPlatformImageStateAlwaysInvalid;
+    otaInterfaces.pal
+        .getPlatformImageState = mockPalGetPlatformImageStateAlwaysInvalid;
     TEST_ASSERT_EQUAL( OtaErrNone, OTA_Resume() );
 
-    /* Self test timer should NOT be restarted if the device is not self testing. */
+    /* Self test timer should NOT be restarted if the device is not self
+     * testing. */
     TEST_ASSERT_FALSE( bSelfTestTimerIsActive );
     TEST_ASSERT_TRUE( bRequestTimerIsActive );
 
@@ -1425,7 +1670,8 @@ void test_OTA_CheckForUpdateFailToSendEvent()
     /* Set the event send interface to a mock function that always fail. */
     otaInterfaces.os.event.send = mockOSEventSendAlwaysFail;
 
-    /* Check for update should fail and OTA agent should remain in requesting job state. */
+    /* Check for update should fail and OTA agent should remain in requesting
+     * job state. */
     TEST_ASSERT_EQUAL( OtaErrSignalEventFailed, OTA_CheckForUpdate() );
     TEST_ASSERT_EQUAL( OtaAgentStateRequestingJob, OTA_GetState() );
 }
@@ -1435,15 +1681,16 @@ void test_OTA_ActivateNewImage()
     otaGoToState( OtaAgentStateReady );
     TEST_ASSERT_EQUAL( OtaAgentStateReady, OTA_GetState() );
 
-    /* Activate image simply calls the PAL implementation and return its return value. */
+    /* Activate image simply calls the PAL implementation and return its return
+     * value. */
     TEST_ASSERT_EQUAL( OtaErrNone, OTA_ActivateNewImage() );
 
     otaInterfaces.pal.activate = mockPalActivateReturnFail;
     TEST_ASSERT_EQUAL( OtaErrActivateFailed, OTA_ActivateNewImage() );
 }
 
-/* OTA pal function pointers should be NULL when OTA agent stopped. Calling OTA_ActivateNewImage
- * should fail. */
+/* OTA pal function pointers should be NULL when OTA agent stopped. Calling
+ * OTA_ActivateNewImage should fail. */
 void test_OTA_ActivateNewImageWhenStopped()
 {
     TEST_ASSERT_NOT_EQUAL( OtaErrActivateFailed, OTA_ActivateNewImage() );
@@ -1484,7 +1731,8 @@ void test_OTA_ImageStateAbortWithActiveJob()
 {
     otaGoToState( OtaAgentStateWaitingForFileBlock );
 
-    /* Calling abort with an active job would make OTA agent transit to waiting for job state. */
+    /* Calling abort with an active job would make OTA agent transit to waiting
+     * for job state. */
     TEST_ASSERT_EQUAL( OtaErrNone, OTA_SetImageState( OtaImageStateAborted ) );
     receiveAndProcessOtaEvent();
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
@@ -1495,11 +1743,13 @@ void test_OTA_ImageStateAbortWithNoJob()
     otaGoToState( OtaAgentStateReady );
     TEST_ASSERT_EQUAL( OtaAgentStateReady, OTA_GetState() );
 
-    /* Set the event send interface to a mock function that allows events to be sent continuously
-     * since setting image state to abort would send an user abort event in the handler. */
+    /* Set the event send interface to a mock function that allows events to be
+     * sent continuously since setting image state to abort would send an user
+     * abort event in the handler. */
     otaInterfaces.os.event.send = mockOSEventSend;
 
-    /* Calling abort without an active job would fail. OTA agent should remain in ready state. */
+    /* Calling abort without an active job would fail. OTA agent should remain
+     * in ready state. */
     TEST_ASSERT_EQUAL( OtaErrNone, OTA_SetImageState( OtaImageStateAborted ) );
     receiveAndProcessOtaEvent();
     TEST_ASSERT_EQUAL( OtaAgentStateReady, OTA_GetState() );
@@ -1513,7 +1763,8 @@ void test_OTA_ImageStateAbortFailToSendEvent()
     /* Set the event send interface to a mock function that always fail. */
     otaInterfaces.os.event.send = mockOSEventSendAlwaysFail;
 
-    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed, OTA_SetImageState( OtaImageStateAborted ) );
+    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed,
+                       OTA_SetImageState( OtaImageStateAborted ) );
     TEST_ASSERT_EQUAL( OtaAgentStateReady, OTA_GetState() );
 }
 
@@ -1527,8 +1778,10 @@ void test_OTA_ImageStateAbortUpdateStatusFail()
     /* Successfully send the event to abort the image. */
     TEST_ASSERT_EQUAL( OtaErrNone, OTA_SetImageState( OtaImageStateAborted ) );
 
-    /* Process the event to abort the image and fail to update the job status. */
-    otaControlInterface.updateJobStatus = mockControlInterfaceUpdateJobAlwaysFail;
+    /* Process the event to abort the image and fail to update the job status.
+     */
+    otaControlInterface
+        .updateJobStatus = mockControlInterfaceUpdateJobAlwaysFail;
     receiveAndProcessOtaEvent();
 
     /* Test that the image state will be set regardless of whether or not the
@@ -1549,7 +1802,8 @@ void test_OTA_ImageStateRjectWithNoJob()
     otaGoToState( OtaAgentStateReady );
     TEST_ASSERT_EQUAL( OtaAgentStateReady, OTA_GetState() );
 
-    TEST_ASSERT_EQUAL( OtaErrNoActiveJob, OTA_SetImageState( OtaImageStateRejected ) );
+    TEST_ASSERT_EQUAL( OtaErrNoActiveJob,
+                       OTA_SetImageState( OtaImageStateRejected ) );
     TEST_ASSERT_EQUAL( OtaImageStateRejected, OTA_GetImageState() );
 }
 
@@ -1576,7 +1830,8 @@ void test_OTA_ImageStateAcceptWithNoJob()
     otaGoToState( OtaAgentStateReady );
     TEST_ASSERT_EQUAL( OtaAgentStateReady, OTA_GetState() );
 
-    TEST_ASSERT_EQUAL( OtaErrNoActiveJob, OTA_SetImageState( OtaImageStateAccepted ) );
+    TEST_ASSERT_EQUAL( OtaErrNoActiveJob,
+                       OTA_SetImageState( OtaImageStateAccepted ) );
     TEST_ASSERT_EQUAL( OtaImageStateAccepted, OTA_GetImageState() );
 }
 
@@ -1587,9 +1842,11 @@ void test_OTA_ImageStateInvalidState()
 
 void test_OTA_ImageStatePalFail()
 {
-    otaInterfaces.pal.setPlatformImageState = mockPalSetPlatformImageStateAlwaysFail;
+    otaInterfaces.pal
+        .setPlatformImageState = mockPalSetPlatformImageStateAlwaysFail;
     otaGoToState( OtaAgentStateReady );
-    TEST_ASSERT_EQUAL( OtaErrNoActiveJob, OTA_SetImageState( OtaImageStateAccepted ) );
+    TEST_ASSERT_EQUAL( OtaErrNoActiveJob,
+                       OTA_SetImageState( OtaImageStateAccepted ) );
     TEST_ASSERT_EQUAL( OtaImageStateRejected, OTA_GetImageState() );
 }
 
@@ -1599,7 +1856,8 @@ void test_OTA_ImageStateWithReasonPalFail()
     OtaErr_t error;
 
     otaGoToState( OtaAgentStateReady );
-    otaInterfaces.pal.setPlatformImageState = mockPalSetPlatformImageStateAlwaysFail;
+    otaInterfaces.pal
+        .setPlatformImageState = mockPalSetPlatformImageStateAlwaysFail;
     error = setImageStateWithReason( stateToSet, OtaErrImageStateMismatch );
     TEST_ASSERT_EQUAL( OtaErrNoActiveJob, error );
 }
@@ -1663,7 +1921,6 @@ void test_OTA_ProcessJobDocumentInvalidJson()
 void test_OTA_ProcessJobDocumentInvalidBase64Key()
 {
     pOtaJobDoc = JOB_DOC_INVALID_BASE64_KEY;
-
 
     otaGoToState( OtaAgentStateWaitingForJob );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
@@ -1744,7 +2001,8 @@ void test_OTA_ProcessCustomJobFailsInvalidKeys()
     otaGoToState( OtaAgentStateCreatingFile );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
 
-    /* Custom job parsing fails with value of 'jobId' exceeding max length(72). */
+    /* Custom job parsing fails with value of 'jobId' exceeding max length(72).
+     */
     pOtaJobDoc = JOB_DOC_INVALID_JOB_ID;
     otaGoToState( OtaAgentStateCreatingFile );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
@@ -1757,7 +2015,8 @@ void test_OTA_RejectWhileAborted()
     otaGoToState( OtaAgentStateWaitingForJob );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
 
-    otaInterfaces.pal.setPlatformImageState = mockPalSetPlatformImageStateAlwaysFail;
+    otaInterfaces.pal
+        .setPlatformImageState = mockPalSetPlatformImageStateAlwaysFail;
     otaReceiveJobDocument();
     receiveAndProcessOtaEvent();
 
@@ -1783,7 +2042,8 @@ void test_OTA_ProcessJobDocumentInvalidProtocol()
 void test_OTA_ProcessJobDocumentInvalidProtocolPalFails()
 {
     pOtaJobDoc = JOB_DOC_INVALID_PROTOCOL;
-    otaInterfaces.pal.setPlatformImageState = mockPalSetPlatformImageStateAlwaysFail;
+    otaInterfaces.pal
+        .setPlatformImageState = mockPalSetPlatformImageStateAlwaysFail;
 
     otaGoToState( OtaAgentStateWaitingForJob );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
@@ -1900,8 +2160,9 @@ void test_OTA_InitFileTransferRetryFail()
     /* Allow event to be sent continuously so that retries can work. */
     otaInterfaces.os.event.send = mockOSEventSend;
 
-    /* After receiving a valid job document, OTA agent should first transit to creating file state.
-     * Then keep calling init file transfer until failed, which should then shutdown itself. */
+    /* After receiving a valid job document, OTA agent should first transit to
+     * creating file state. Then keep calling init file transfer until failed,
+     * which should then shutdown itself. */
     otaReceiveJobDocument();
     receiveAndProcessOtaEvent();
     TEST_ASSERT_EQUAL( OtaAgentStateCreatingFile, OTA_GetState() );
@@ -1981,7 +2242,8 @@ void test_OTA_RequestFileBlockRetryFail()
 {
     uint32_t i = 0;
 
-    /* Use HTTP data transfer so we can intentionally fail the file block request. */
+    /* Use HTTP data transfer so we can intentionally fail the file block
+     * request. */
     pOtaJobDoc = JOB_DOC_HTTP;
 
     otaGoToState( OtaAgentStateWaitingForJob );
@@ -1996,8 +2258,9 @@ void test_OTA_RequestFileBlockRetryFail()
     /* Allow event to be sent continuously so that retries can work. */
     otaInterfaces.os.event.send = mockOSEventSend;
 
-    /* After receiving a valid job document and starts file transfer, OTA agent should first transit
-     * to requesting file block state. Then keep calling request file block until failed. */
+    /* After receiving a valid job document and starts file transfer, OTA agent
+     * should first transit to requesting file block state. Then keep calling
+     * request file block until failed. */
 
     /* Receive the job document. */
     otaReceiveJobDocument();
@@ -2037,9 +2300,10 @@ void test_OTA_ReceiveFileBlockEmpty()
     otaGoToState( OtaAgentStateWaitingForFileBlock );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForFileBlock, OTA_GetState() );
 
-    /* Set the event send interface to a mock function that allows events to be sent continuously.
-     * This is required because decode failure would cause OtaAgentEventCloseFile event to be sent
-     * within the OTA event handler and we want it to be processed. */
+    /* Set the event send interface to a mock function that allows events to be
+     * sent continuously. This is required because decode failure would cause
+     * OtaAgentEventCloseFile event to be sent within the OTA event handler and
+     * we want it to be processed. */
     otaInterfaces.os.event.send = mockOSEventSend;
 
     otaEvent.eventId = OtaAgentEventReceivedFileBlock;
@@ -2181,7 +2445,8 @@ void test_OTA_ReceiveWritePartialBlockFail()
 void test_OTA_ReceiveFileBlockCompleteMqtt()
 {
     OtaEventMsg_t otaEvent;
-    OtaEventData_t eventBuffers[ OTA_TEST_FILE_NUM_BLOCKS * OTA_TEST_DUPLICATE_NUM_BLOCKS ];
+    OtaEventData_t eventBuffers[ OTA_TEST_FILE_NUM_BLOCKS *
+                                 OTA_TEST_DUPLICATE_NUM_BLOCKS ];
     uint8_t pFileBlock[ OTA_FILE_BLOCK_SIZE ] = { 0 };
     uint8_t pStreamingMessage[ OTA_FILE_BLOCK_SIZE * 2 ] = { 0 };
     size_t streamingMessageSize = 0;
@@ -2192,8 +2457,9 @@ void test_OTA_ReceiveFileBlockCompleteMqtt()
     otaGoToState( OtaAgentStateWaitingForFileBlock );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForFileBlock, OTA_GetState() );
 
-    /* Set the event send interface to a mock function that allows events to be sent continuously
-     * because we're receiving multiple blocks in this test. */
+    /* Set the event send interface to a mock function that allows events to be
+     * sent continuously because we're receiving multiple blocks in this test.
+     */
     otaInterfaces.os.event.send = mockOSEventSend;
 
     /* Fill the file block. */
@@ -2207,22 +2473,27 @@ void test_OTA_ReceiveFileBlockCompleteMqtt()
 
     while( remainingBytes >= 0 )
     {
-        /* Intentionally send duplicate blocks to test if we are handling it correctly. */
+        /* Intentionally send duplicate blocks to test if we are handling it
+         * correctly. */
         for( dupIdx = 0; dupIdx < OTA_TEST_DUPLICATE_NUM_BLOCKS; dupIdx++ )
         {
             /* Construct a AWS IoT streaming message. */
-            createOtaStreamingMessage(
-                pStreamingMessage,
-                sizeof( pStreamingMessage ),
-                idx,
-                pFileBlock,
-                min( ( uint32_t ) remainingBytes, OTA_FILE_BLOCK_SIZE ),
-                &streamingMessageSize,
-                true );
+            createOtaStreamingMessage( pStreamingMessage,
+                                       sizeof( pStreamingMessage ),
+                                       idx,
+                                       pFileBlock,
+                                       min( ( uint32_t ) remainingBytes,
+                                            OTA_FILE_BLOCK_SIZE ),
+                                       &streamingMessageSize,
+                                       true );
 
             otaEvent.eventId = OtaAgentEventReceivedFileBlock;
-            otaEvent.pEventData = &eventBuffers[ idx * OTA_TEST_DUPLICATE_NUM_BLOCKS + dupIdx ];
-            memcpy( otaEvent.pEventData->data, pStreamingMessage, streamingMessageSize );
+            otaEvent
+                .pEventData = &eventBuffers[ idx * OTA_TEST_DUPLICATE_NUM_BLOCKS +
+                                             dupIdx ];
+            memcpy( otaEvent.pEventData->data,
+                    pStreamingMessage,
+                    streamingMessageSize );
             otaEvent.pEventData->dataLength = streamingMessageSize;
             OTA_SignalEvent( &otaEvent );
         }
@@ -2233,14 +2504,16 @@ void test_OTA_ReceiveFileBlockCompleteMqtt()
 
     /* Process all of the events for receiving an MQTT message. */
     processEntireQueue();
-    /* OTA agent should complete the update and go back to waiting for job state. */
+    /* OTA agent should complete the update and go back to waiting for job
+     * state. */
     receiveAndProcessOtaEvent();
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
 
     /* Check if received complete file. */
     for( idx = 0; idx < OTA_TEST_FILE_SIZE; ++idx )
     {
-        TEST_ASSERT_EQUAL( pFileBlock[ idx % sizeof( pFileBlock ) ], pOtaFileBuffer[ idx ] );
+        TEST_ASSERT_EQUAL( pFileBlock[ idx % sizeof( pFileBlock ) ],
+                           pOtaFileBuffer[ idx ] );
     }
 }
 
@@ -2277,18 +2550,19 @@ void test_OTA_ReceiveFileBlockMallocFail()
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForFileBlock, OTA_GetState() );
 
     /* Create and send the data block. */
-    createOtaStreamingMessage(
-        pStreamingMessage,
-        sizeof( pStreamingMessage ),
-        0,
-        pFileBlock,
-        OTA_FILE_BLOCK_SIZE,
-        &streamingMessageSize,
-        true );
+    createOtaStreamingMessage( pStreamingMessage,
+                               sizeof( pStreamingMessage ),
+                               0,
+                               pFileBlock,
+                               OTA_FILE_BLOCK_SIZE,
+                               &streamingMessageSize,
+                               true );
 
     otaEvent.eventId = OtaAgentEventReceivedFileBlock;
     otaEvent.pEventData = &eventBuffer;
-    memcpy( otaEvent.pEventData->data, pStreamingMessage, streamingMessageSize );
+    memcpy( otaEvent.pEventData->data,
+            pStreamingMessage,
+            streamingMessageSize );
     otaEvent.pEventData->dataLength = streamingMessageSize;
     OTA_SignalEvent( &otaEvent );
 
@@ -2311,7 +2585,6 @@ void test_OTA_DroppedFileBlock()
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForFileBlock, OTA_GetState() );
     /* No blocks have been received or dropped yet. */
     TEST_ASSERT_EQUAL( 0, otaAgent.statistics.otaPacketsDropped );
-
 
     /* Prepare an event as if we are receiving a data block. */
     otaEvent.eventId = OtaAgentEventReceivedFileBlock;
@@ -2341,8 +2614,9 @@ void test_OTA_ReceiveFileBlockCompleteHttp()
     otaGoToState( OtaAgentStateWaitingForFileBlock );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForFileBlock, OTA_GetState() );
 
-    /* Set the event send interface to a mock function that allows events to be sent continuously
-     * because we're receiving multiple blocks in this test. */
+    /* Set the event send interface to a mock function that allows events to be
+     * sent continuously because we're receiving multiple blocks in this test.
+     */
     otaInterfaces.os.event.send = mockOSEventSend;
 
     /* Fill the file block. */
@@ -2366,14 +2640,16 @@ void test_OTA_ReceiveFileBlockCompleteHttp()
         remainingBytes -= OTA_FILE_BLOCK_SIZE;
     }
 
-    /* OTA agent should complete the update and go back to waiting for job state. */
+    /* OTA agent should complete the update and go back to waiting for job
+     * state. */
     processEntireQueue();
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
 
     /* Check if received complete file. */
     for( idx = 0; idx < OTA_TEST_FILE_SIZE; ++idx )
     {
-        TEST_ASSERT_EQUAL( pFileBlock[ idx % sizeof( pFileBlock ) ], pOtaFileBuffer[ idx ] );
+        TEST_ASSERT_EQUAL( pFileBlock[ idx % sizeof( pFileBlock ) ],
+                           pOtaFileBuffer[ idx ] );
     }
 }
 
@@ -2384,17 +2660,18 @@ void test_OTA_ReceiveFileBlockCompleteDynamicBufferHttp()
 }
 
 /**
- * @brief Test that extractAndStoreArray fails if device does not have sufficient
- * memory to allocate the string/array (here streamname).
+ * @brief Test that extractAndStoreArray fails if device does not have
+ * sufficient memory to allocate the string/array (here streamname).
  */
 void test_OTA_ExtractArrayMemAllocFails()
 {
     otaInterfaces.os.mem.malloc = mockMallocAlwaysFail;
     pOtaAppBuffer.streamNameSize = 0;
 
-    /* Try to reach state OtaAgentStateCreatingFile, which would require the device
-     * to receive a job document and allocate resources and store the parameters.
-     * Insufficient memory causes the job to fail and state reverts to  OtaAgentStateWaitingForJob.
+    /* Try to reach state OtaAgentStateCreatingFile, which would require the
+     * device to receive a job document and allocate resources and store the
+     * parameters. Insufficient memory causes the job to fail and state reverts
+     * to  OtaAgentStateWaitingForJob.
      */
     otaGoToState( OtaAgentStateCreatingFile );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
@@ -2408,21 +2685,21 @@ void test_OTA_ExtractArrayInsufficientBuffer()
 {
     pOtaAppBuffer.streamNameSize = OTA_INVALID_STREAM_NAME_SIZE;
 
-    /* Try to reach state OtaAgentStateCreatingFile, which would require the device
-     * to receive a job document and allocate resources and store the parameters.
-     * Insufficient memory causes the job to fail and state reverts to  OtaAgentStateWaitingForJob.
+    /* Try to reach state OtaAgentStateCreatingFile, which would require the
+     * device to receive a job document and allocate resources and store the
+     * parameters. Insufficient memory causes the job to fail and state reverts
+     * to  OtaAgentStateWaitingForJob.
      */
     otaGoToState( OtaAgentStateCreatingFile );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
 }
 
-
 void test_OTA_ProcessJobDocumentFileIdNotZero()
 {
     pOtaJobDoc = JOB_DOC_SERVERFILE_ID;
 
-    /* Set the event send interface to a mock function that allows events to be sent continuously.
-     * This is to complete the self test process. */
+    /* Set the event send interface to a mock function that allows events to be
+     * sent continuously. This is to complete the self test process. */
     otaInterfaces.os.event.send = mockOSEventSend;
 
     otaGoToState( OtaAgentStateWaitingForJob );
@@ -2441,8 +2718,8 @@ static void invokeSelfTestHandler()
 {
     pOtaJobDoc = JOB_DOC_SELF_TEST;
 
-    /* Set the event send interface to a mock function that allows events to be sent continuously.
-     * This is to complete the self test process. */
+    /* Set the event send interface to a mock function that allows events to be
+     * sent continuously. This is to complete the self test process. */
     otaInterfaces.os.event.send = mockOSEventSend;
 
     otaGoToState( OtaAgentStateWaitingForJob );
@@ -2479,7 +2756,8 @@ void test_OTA_SelfTestJobEventSendFail()
 void test_OTA_SelfTestJobNonSelfTestPlatform()
 {
     /* Let the PAL always says it's not in self test. */
-    otaInterfaces.pal.getPlatformImageState = mockPalGetPlatformImageStateAlwaysInvalid;
+    otaInterfaces.pal
+        .getPlatformImageState = mockPalGetPlatformImageStateAlwaysInvalid;
 
     invokeSelfTestHandler();
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
@@ -2489,7 +2767,8 @@ void test_OTA_SelfTestJobNonSelfTestPlatform()
 void test_OTA_NonSelfTestJobSelfTestPlatform()
 {
     /* Let the PAL always says it's in self test. */
-    otaInterfaces.pal.getPlatformImageState = mockPalGetPlatformImageStateAlwaysPendingCommit;
+    otaInterfaces.pal
+        .getPlatformImageState = mockPalGetPlatformImageStateAlwaysPendingCommit;
 
     otaGoToState( OtaAgentStateCreatingFile );
     TEST_ASSERT_EQUAL( OtaAgentStateCreatingFile, OTA_GetState() );
@@ -2536,7 +2815,8 @@ void test_OTA_SelfTestJobNonFirmwareFileType()
 
 void test_OTA_StartWithSelfTest()
 {
-    /* Directly set pal image state to pending commit, pretending we're in self test. */
+    /* Directly set pal image state to pending commit, pretending we're in self
+     * test. */
     palImageState = OtaPalImageStatePendingCommit;
 
     /* Let timer start to invoke callback directly. */
@@ -2558,15 +2838,15 @@ void test_OTA_ReceiveNewJobDocWhileInProgress()
     /* Reset the event queue so that we can send the next event. */
     mockOSEventReset( NULL );
 
-    /* Sending another job document should cause OTA agent to abort current update. */
+    /* Sending another job document should cause OTA agent to abort current
+     * update. */
     pOtaJobDoc = JOB_DOC_B;
     otaReceiveJobDocument();
     receiveAndProcessOtaEvent();
     TEST_ASSERT_EQUAL( OtaAgentStateRequestingJob, OTA_GetState() );
 }
 
-static void refreshWithJobDoc( const char * initJobDoc,
-                               const char * newJobDoc )
+static void refreshWithJobDoc( const char * initJobDoc, const char * newJobDoc )
 {
     OtaEventMsg_t otaEvent = { 0 };
 
@@ -2575,18 +2855,21 @@ static void refreshWithJobDoc( const char * initJobDoc,
     otaGoToState( OtaAgentStateWaitingForFileBlock );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForFileBlock, OTA_GetState() );
 
-    /* Set the event send interface to a mock function that allows events to be sent continuously.
-     * We need this to go through the process of refreshing job doc. */
+    /* Set the event send interface to a mock function that allows events to be
+     * sent continuously. We need this to go through the process of refreshing
+     * job doc. */
     otaInterfaces.os.event.send = mockOSEventSend;
 
-    /* First send request job doc event while we're in progress, this should make OTA agent to
-     * to request job doc again and transit to waiting for job state. */
+    /* First send request job doc event while we're in progress, this should
+     * make OTA agent to to request job doc again and transit to waiting for job
+     * state. */
     otaEvent.eventId = OtaAgentEventRequestJobDocument;
     OTA_SignalEvent( &otaEvent );
     receiveAndProcessOtaEvent();
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
 
-    /* Now send the new job doc, OTA agent should abort current job and start the new job. */
+    /* Now send the new job doc, OTA agent should abort current job and start
+     * the new job. */
     pOtaJobDoc = newJobDoc;
     otaReceiveJobDocument();
     receiveAndProcessOtaEvent();
@@ -2615,19 +2898,21 @@ void test_OTA_RefreshWithInvalidJobDoc()
     otaGoToState( OtaAgentStateWaitingForFileBlock );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForFileBlock, OTA_GetState() );
 
-    /* Set the event send interface to a mock function that allows events to be sent continuously.
-     * We need this to go through the process of refreshing job doc. */
+    /* Set the event send interface to a mock function that allows events to be
+     * sent continuously. We need this to go through the process of refreshing
+     * job doc. */
     otaInterfaces.os.event.send = mockOSEventSend;
 
-    /* Send the request job document event while the OTA Agent is already in the process of
-     * downloading a file. The OTA Agent should cancel the current job and begin waiting
-     * for the next job document. */
+    /* Send the request job document event while the OTA Agent is already in the
+     * process of downloading a file. The OTA Agent should cancel the current
+     * job and begin waiting for the next job document. */
     otaEvent.eventId = OtaAgentEventRequestJobDocument;
     OTA_SignalEvent( &otaEvent );
     receiveAndProcessOtaEvent();
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
 
-    /* Now send the new job doc, OTA agent should abort current job and start the new job. */
+    /* Now send the new job doc, OTA agent should abort current job and start
+     * the new job. */
     pOtaJobDoc = JOB_DOC_MISSING_KEY;
     otaReceiveJobDocument();
     receiveAndProcessOtaEvent();
@@ -2718,7 +3003,8 @@ void test_OTA_UpdateJobStatus()
     /* Verify the conversion of the value 0U and 2U to a string */
     otaInterfaces.mqtt.publish = stubMqttPublishZeroBlocksReceived;
 
-    /* Set the file size to an arbitrary value < block size to ensure 2 blocks for the OTA */
+    /* Set the file size to an arbitrary value < block size to ensure 2 blocks
+     * for the OTA */
     otaAgent.fileContext.fileSize = 100U;
     /* With 2 blocks remaining, status message will say '0/2' blocks received */
     otaAgent.fileContext.blocksRemaining = 2U;
@@ -2740,7 +3026,8 @@ void test_OTA_EventProcessingTask_ExitOnAbort()
      * and event to shutdown the OTA Agent. */
     TEST_ASSERT_EQUAL( OtaAgentStateStopped, OTA_GetState() );
 
-    /* Run OTA_EventProcessingTask again and OTA state should keep in OtaAgentStateStopped. */
+    /* Run OTA_EventProcessingTask again and OTA state should keep in
+     * OtaAgentStateStopped. */
     OTA_EventProcessingTask( NULL );
 
     TEST_ASSERT_EQUAL( OtaAgentStateStopped, OTA_GetState() );
@@ -2772,7 +3059,8 @@ void test_OTA_EventProcess_WhileStopped()
     otaInterfaces.os.event.send = mockOSEventSend;
     otaAgent.pOtaInterface = &otaInterfaces;
 
-    /* Agent is stopped so event should not be processed and user callbacks/functions should not be exercised. */
+    /* Agent is stopped so event should not be processed and user
+     * callbacks/functions should not be exercised. */
     otaEvent.eventId = OtaAgentEventReceivedJobDocument;
     OTA_SignalEvent( &otaEvent );
     ulQueueEndBefore = otaEventQueueEnd;
@@ -2786,8 +3074,8 @@ void test_OTA_EventProcess_AgentUpdatesReadiness()
     otaInterfaces.os.event.send = mockOSEventSend;
     otaGoToState( OtaAgentStateStopped );
 
-    /* Internally calls OTA_Init which will set state to initialized state, which will allow
-     * OTA_EventProcess to set state to OtaAgentStateReady */
+    /* Internally calls OTA_Init which will set state to initialized state,
+     * which will allow OTA_EventProcess to set state to OtaAgentStateReady */
     otaInitDefault();
     TEST_ASSERT_EQUAL( OtaAgentStateInit, OTA_GetState() );
 
@@ -2795,8 +3083,6 @@ void test_OTA_EventProcess_AgentUpdatesReadiness()
      * and update agent to indicate readiness */
     TEST_ASSERT_EQUAL( OtaAgentStateReady, OTA_EventProcess() );
 }
-
-
 
 /* ========================================================================== */
 /* ====================== OTA MQTT and HTTP Unit Tests ====================== */
@@ -3214,11 +3500,13 @@ void test_OTA_initFileHandler_TimerFails( void )
     /* Initialize the OTA interfaces so they are not NULL. */
     otaGoToState( OtaAgentStateReady );
     /* Fail to initialize the file transfer so the timer is started. */
-    otaDataInterface.initFileTransfer = mockDataInterfaceInitFileTransferAlwaysFail;
+    otaDataInterface
+        .initFileTransfer = mockDataInterfaceInitFileTransferAlwaysFail;
     /* Fail to start the timer. */
     otaInterfaces.os.timer.start = mockOSTimerStartAlwaysFail;
 
-    TEST_ASSERT_EQUAL( OtaErrInitFileTransferFailed, initFileHandler( otaEvent.pEventData ) );
+    TEST_ASSERT_EQUAL( OtaErrInitFileTransferFailed,
+                       initFileHandler( otaEvent.pEventData ) );
 }
 
 /**
@@ -3235,7 +3523,8 @@ void test_OTA_initFileHandler_EventSendFails( void )
     /* Test failing while trying to send the shutdown event after failing
      * to initialize the file. */
     /* Fail to initialize the file transfer so the timer is started. */
-    otaDataInterface.initFileTransfer = mockDataInterfaceInitFileTransferAlwaysFail;
+    otaDataInterface
+        .initFileTransfer = mockDataInterfaceInitFileTransferAlwaysFail;
 
     /* Simulate reaching the maximum number of attempts before considering
      * the attempt to be a failure. */
@@ -3243,7 +3532,8 @@ void test_OTA_initFileHandler_EventSendFails( void )
     /* Fail to send the OTA event. */
     otaInterfaces.os.event.send = mockOSEventSendAlwaysFail;
 
-    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed, initFileHandler( otaEvent.pEventData ) );
+    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed,
+                       initFileHandler( otaEvent.pEventData ) );
 
     /* Test failing while trying to send the request block event after
      * successfully initializing the file. */
@@ -3254,7 +3544,8 @@ void test_OTA_initFileHandler_EventSendFails( void )
     /* Fail to send the OTA event. */
     otaInterfaces.os.event.send = mockOSEventSendAlwaysFail;
 
-    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed, initFileHandler( otaEvent.pEventData ) );
+    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed,
+                       initFileHandler( otaEvent.pEventData ) );
 }
 
 /**
@@ -3278,7 +3569,8 @@ void test_OTA_requestDataHandler_EventSendFails( void )
     /* Fail to send the OTA event. */
     otaInterfaces.os.event.send = mockOSEventSendAlwaysFail;
 
-    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed, requestDataHandler( otaEvent.pEventData ) );
+    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed,
+                       requestDataHandler( otaEvent.pEventData ) );
 }
 
 /**
@@ -3297,7 +3589,8 @@ void test_OTA_requestJobHandler_TimerFails( void )
     /* Fail to start the request timer. */
     otaInterfaces.os.timer.start = mockOSTimerStartAlwaysFail;
 
-    TEST_ASSERT_EQUAL( OtaErrRequestJobFailed, requestJobHandler( otaEvent.pEventData ) );
+    TEST_ASSERT_EQUAL( OtaErrRequestJobFailed,
+                       requestJobHandler( otaEvent.pEventData ) );
 }
 
 /**
@@ -3320,7 +3613,8 @@ void test_OTA_requestJobHandler_EventSendFails( void )
     /* Fail to send the OTA event. */
     otaInterfaces.os.event.send = mockOSEventSendAlwaysFail;
 
-    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed, requestJobHandler( otaEvent.pEventData ) );
+    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed,
+                       requestJobHandler( otaEvent.pEventData ) );
 }
 
 /**
@@ -3360,7 +3654,8 @@ void test_OTA_jobNotificationHandler_EventSendFails()
 
     otaInterfaces.os.event.send = mockOSEventSendAlwaysFail;
 
-    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed, jobNotificationHandler( NULL ) );
+    TEST_ASSERT_EQUAL( OtaErrSignalEventFailed,
+                       jobNotificationHandler( NULL ) );
 }
 
 /**
@@ -3477,7 +3772,8 @@ void test_OTA_setDataInterface_ValidInput( void )
     uint8_t pProtocol[ OTA_PROTOCOL_BUFFER_SIZE ] = { 0 };
 
     memcpy( pProtocol, "[\"MQTT\"]", sizeof( "[\"MQTT\"]" ) );
-    TEST_ASSERT_EQUAL( OtaErrNone, setDataInterface( &dataInterface, pProtocol ) );
+    TEST_ASSERT_EQUAL( OtaErrNone,
+                       setDataInterface( &dataInterface, pProtocol ) );
     TEST_ASSERT_EQUAL( initFileTransfer_Mqtt, dataInterface.initFileTransfer );
     TEST_ASSERT_EQUAL( requestFileBlock_Mqtt, dataInterface.requestFileBlock );
     TEST_ASSERT_EQUAL( decodeFileBlock_Mqtt, dataInterface.decodeFileBlock );
@@ -3485,7 +3781,8 @@ void test_OTA_setDataInterface_ValidInput( void )
 
     memcpy( pProtocol, "[\"HTTP\"]", sizeof( "[\"HTTP\"]" ) );
     memset( &dataInterface, 0, sizeof( dataInterface ) );
-    TEST_ASSERT_EQUAL( OtaErrNone, setDataInterface( &dataInterface, pProtocol ) );
+    TEST_ASSERT_EQUAL( OtaErrNone,
+                       setDataInterface( &dataInterface, pProtocol ) );
     TEST_ASSERT_EQUAL( initFileTransfer_Http, dataInterface.initFileTransfer );
     TEST_ASSERT_EQUAL( requestDataBlock_Http, dataInterface.requestFileBlock );
     TEST_ASSERT_EQUAL( decodeFileBlock_Http, dataInterface.decodeFileBlock );
@@ -3493,7 +3790,8 @@ void test_OTA_setDataInterface_ValidInput( void )
 
     memcpy( pProtocol, "[\"MQTT\",\"HTTP\"]", sizeof( "[\"MQTT\",\"HTTP\"]" ) );
     memset( &dataInterface, 0, sizeof( dataInterface ) );
-    TEST_ASSERT_EQUAL( OtaErrNone, setDataInterface( &dataInterface, pProtocol ) );
+    TEST_ASSERT_EQUAL( OtaErrNone,
+                       setDataInterface( &dataInterface, pProtocol ) );
     TEST_ASSERT_NOT_EQUAL( NULL, dataInterface.initFileTransfer );
     TEST_ASSERT_NOT_EQUAL( NULL, dataInterface.requestFileBlock );
     TEST_ASSERT_NOT_EQUAL( NULL, dataInterface.decodeFileBlock );
@@ -3501,7 +3799,8 @@ void test_OTA_setDataInterface_ValidInput( void )
 
     memcpy( pProtocol, "[\"HTTP\",\"MQTT\"]", sizeof( "[\"HTTP\",\"MQTT\"]" ) );
     memset( &dataInterface, 0, sizeof( dataInterface ) );
-    TEST_ASSERT_EQUAL( OtaErrNone, setDataInterface( &dataInterface, pProtocol ) );
+    TEST_ASSERT_EQUAL( OtaErrNone,
+                       setDataInterface( &dataInterface, pProtocol ) );
     TEST_ASSERT_NOT_EQUAL( NULL, dataInterface.initFileTransfer );
     TEST_ASSERT_NOT_EQUAL( NULL, dataInterface.requestFileBlock );
     TEST_ASSERT_NOT_EQUAL( NULL, dataInterface.decodeFileBlock );
@@ -3518,27 +3817,29 @@ void test_OTA_setDataInterface_InvalidInput( void )
     uint8_t pProtocol[ OTA_PROTOCOL_BUFFER_SIZE ] = { 0 };
 
     memcpy( pProtocol, "invalid_protocol", sizeof( "invalid_protocol" ) );
-    TEST_ASSERT_EQUAL( OtaErrInvalidDataProtocol, setDataInterface( &dataInterface, pProtocol ) );
+    TEST_ASSERT_EQUAL( OtaErrInvalidDataProtocol,
+                       setDataInterface( &dataInterface, pProtocol ) );
     TEST_ASSERT_EQUAL( NULL, dataInterface.initFileTransfer );
     TEST_ASSERT_EQUAL( NULL, dataInterface.requestFileBlock );
     TEST_ASSERT_EQUAL( NULL, dataInterface.decodeFileBlock );
     TEST_ASSERT_EQUAL( NULL, dataInterface.cleanup );
 
     memcpy( pProtocol, "junkMQTT", sizeof( "junkMQTT" ) );
-    TEST_ASSERT_EQUAL( OtaErrInvalidDataProtocol, setDataInterface( &dataInterface, pProtocol ) );
+    TEST_ASSERT_EQUAL( OtaErrInvalidDataProtocol,
+                       setDataInterface( &dataInterface, pProtocol ) );
     TEST_ASSERT_EQUAL( NULL, dataInterface.initFileTransfer );
     TEST_ASSERT_EQUAL( NULL, dataInterface.requestFileBlock );
     TEST_ASSERT_EQUAL( NULL, dataInterface.decodeFileBlock );
     TEST_ASSERT_EQUAL( NULL, dataInterface.cleanup );
 
     memcpy( pProtocol, "HTTPjunk", sizeof( "HTTPjunk" ) );
-    TEST_ASSERT_EQUAL( OtaErrInvalidDataProtocol, setDataInterface( &dataInterface, pProtocol ) );
+    TEST_ASSERT_EQUAL( OtaErrInvalidDataProtocol,
+                       setDataInterface( &dataInterface, pProtocol ) );
     TEST_ASSERT_EQUAL( NULL, dataInterface.initFileTransfer );
     TEST_ASSERT_EQUAL( NULL, dataInterface.requestFileBlock );
     TEST_ASSERT_EQUAL( NULL, dataInterface.decodeFileBlock );
     TEST_ASSERT_EQUAL( NULL, dataInterface.cleanup );
 }
-
 
 /* ========================================================================== */
 /* ==================== OTA Private Function Unit Tests ===================== */
@@ -3578,7 +3879,12 @@ void test_OTA_parseJobFailsNullJsonDocument()
     DocParseErr_t err;
 
     otaInitDefault();
-    err = parseJobDoc( NULL, 0, JOB_DOC_A, strlen( JOB_DOC_A ), &updateJob, &pContext );
+    err = parseJobDoc( NULL,
+                       0,
+                       JOB_DOC_A,
+                       strlen( JOB_DOC_A ),
+                       &updateJob,
+                       &pContext );
 
     TEST_ASSERT_NULL( pContext );
     TEST_ASSERT_EQUAL( DocParseErrNullBodyPointer, err );
@@ -3590,15 +3896,23 @@ void test_OTA_parseJobFailsMoreBlocksThanBitmap()
     OtaFileContext_t * pContext;
     bool updateJob = false;
     DocParseErr_t err;
-    JsonDocParam_t otaCustomJobDocModelParamStructure[ 1 ] =
-    {
-        { OTA_JSON_JOB_ID_KEY, OTA_JOB_PARAM_REQUIRED, U16_OFFSET( OtaFileContext_t, pJobName ), U16_OFFSET( OtaFileContext_t, jobNameMaxSize ), UINT16_MAX },
+    JsonDocParam_t otaCustomJobDocModelParamStructure[ 1 ] = {
+        { OTA_JSON_JOB_ID_KEY,
+          OTA_JOB_PARAM_REQUIRED,
+          U16_OFFSET( OtaFileContext_t, pJobName ),
+          U16_OFFSET( OtaFileContext_t, jobNameMaxSize ),
+          UINT16_MAX },
     };
 
     /* The document structure has an invalid value for ModelParamType_t. */
     otaAgent.fileContext.blocksRemaining = OTA_MAX_BLOCK_BITMAP_SIZE + 1;
     otaInitDefault();
-    err = parseJobDoc( otaCustomJobDocModelParamStructure, 1, JOB_DOC_A, strlen( JOB_DOC_A ), &updateJob, &pContext );
+    err = parseJobDoc( otaCustomJobDocModelParamStructure,
+                       1,
+                       JOB_DOC_A,
+                       strlen( JOB_DOC_A ),
+                       &updateJob,
+                       &pContext );
 
     TEST_ASSERT_NULL( pContext );
     TEST_ASSERT_EQUAL( DocParseErrNone, err );
@@ -3610,15 +3924,23 @@ void test_OTA_extractParameterFailInvalidJobDocModel()
     OtaFileContext_t * pContext;
     bool updateJob = false;
     DocParseErr_t err;
-    JsonDocParam_t otaCustomJobDocModelParamStructure[ 1 ] =
-    {
-        { OTA_JSON_JOB_ID_KEY, OTA_JOB_PARAM_REQUIRED, U16_OFFSET( OtaFileContext_t, pJobName ), U16_OFFSET( OtaFileContext_t, jobNameMaxSize ), UINT16_MAX },
+    JsonDocParam_t otaCustomJobDocModelParamStructure[ 1 ] = {
+        { OTA_JSON_JOB_ID_KEY,
+          OTA_JOB_PARAM_REQUIRED,
+          U16_OFFSET( OtaFileContext_t, pJobName ),
+          U16_OFFSET( OtaFileContext_t, jobNameMaxSize ),
+          UINT16_MAX },
     };
 
     /* The document structure has an invalid value for ModelParamType_t. */
 
     otaInitDefault();
-    err = parseJobDoc( otaCustomJobDocModelParamStructure, 1, JOB_DOC_A, strlen( JOB_DOC_A ), &updateJob, &pContext );
+    err = parseJobDoc( otaCustomJobDocModelParamStructure,
+                       1,
+                       JOB_DOC_A,
+                       strlen( JOB_DOC_A ),
+                       &updateJob,
+                       &pContext );
 
     TEST_ASSERT_NULL( pContext );
     TEST_ASSERT_EQUAL( DocParseErrNone, err );
@@ -3642,18 +3964,30 @@ void test_OTA_validateDataBlockInputSize()
     /* Block size is too small. */
     TEST_ASSERT_EQUAL( false, validateDataBlock( &fileContext, 0, 0 ) );
     /* Block size is the expected size. */
-    TEST_ASSERT_EQUAL( true, validateDataBlock( &fileContext, 0, OTA_FILE_BLOCK_SIZE ) );
+    TEST_ASSERT_EQUAL( true,
+                       validateDataBlock( &fileContext,
+                                          0,
+                                          OTA_FILE_BLOCK_SIZE ) );
     /* Block size is larger than the expected size. */
-    TEST_ASSERT_EQUAL( false, validateDataBlock( &fileContext, 0, OTA_FILE_BLOCK_SIZE + 1 ) );
+    TEST_ASSERT_EQUAL( false,
+                       validateDataBlock( &fileContext,
+                                          0,
+                                          OTA_FILE_BLOCK_SIZE + 1 ) );
 
     /* Test for when the block is not the final block. */
     fileContext.fileSize = OTA_FILE_BLOCK_SIZE * 2;
     /* Block size is too small. */
     TEST_ASSERT_EQUAL( false, validateDataBlock( &fileContext, 0, 0 ) );
     /* Block size is the expected size. */
-    TEST_ASSERT_EQUAL( true, validateDataBlock( &fileContext, 0, OTA_FILE_BLOCK_SIZE ) );
+    TEST_ASSERT_EQUAL( true,
+                       validateDataBlock( &fileContext,
+                                          0,
+                                          OTA_FILE_BLOCK_SIZE ) );
     /* Block size is larger than the expected size. */
-    TEST_ASSERT_EQUAL( false, validateDataBlock( &fileContext, 0, OTA_FILE_BLOCK_SIZE + 1 ) );
+    TEST_ASSERT_EQUAL( false,
+                       validateDataBlock( &fileContext,
+                                          0,
+                                          OTA_FILE_BLOCK_SIZE + 1 ) );
 }
 
 void test_ingestDataBlockCleanup_NullFile()
@@ -3667,7 +4001,8 @@ void test_ingestDataBlockCleanup_NullFile()
     fileContext.blocksRemaining = 0;
     fileContext.pFile = NULL;
 
-    TEST_ASSERT_EQUAL( IngestResultBadFileHandle, ingestDataBlockCleanup( &fileContext, &closeStatus ) );
+    TEST_ASSERT_EQUAL( IngestResultBadFileHandle,
+                       ingestDataBlockCleanup( &fileContext, &closeStatus ) );
 }
 
 void test_verifyActiveJobStatus_NullJobName()
@@ -3677,7 +4012,10 @@ void test_verifyActiveJobStatus_NullJobName()
     OtaFileContext_t * pFinalFile = &finalFile;
     bool shouldUpdate = false;
 
-    TEST_ASSERT_EQUAL( OtaJobParseErrNullJob, verifyActiveJobStatus( &fileContext, &pFinalFile, &shouldUpdate ) );
+    TEST_ASSERT_EQUAL( OtaJobParseErrNullJob,
+                       verifyActiveJobStatus( &fileContext,
+                                              &pFinalFile,
+                                              &shouldUpdate ) );
 }
 
 void test_verifyActiveJobStatus_NullUpdateURL()
@@ -3687,13 +4025,17 @@ void test_verifyActiveJobStatus_NullUpdateURL()
     OtaFileContext_t * pFinalFile = &finalFile;
     bool shouldUpdate = false;
 
-    /* Set the job names to be the same to simulate receiving a job doc with the same ID. */
+    /* Set the job names to be the same to simulate receiving a job doc with the
+     * same ID. */
     ( void ) memcpy( otaAgent.pActiveJobName, "jobName", sizeof( "jobName" ) );
     fileContext.pJobName = ( uint8_t * ) "jobName";
     /* Set the pUpdateUrlPath to NULL. */
     otaAgent.fileContext.pUpdateUrlPath = NULL;
 
-    TEST_ASSERT_EQUAL( OtaJobParseErrUpdateCurrentJob, verifyActiveJobStatus( &fileContext, &pFinalFile, &shouldUpdate ) );
+    TEST_ASSERT_EQUAL( OtaJobParseErrUpdateCurrentJob,
+                       verifyActiveJobStatus( &fileContext,
+                                              &pFinalFile,
+                                              &shouldUpdate ) );
 }
 
 void test_verifyActiveJobStatus_NullCleanupInterface()
@@ -3716,11 +4058,15 @@ void test_verifyActiveJobStatus_NullCleanupInterface()
 
     /* The verifyActiveJobStatus function is expected to safely avoid calling
      * the cleanup function if it is not defined. */
-    TEST_ASSERT_EQUAL( OtaJobParseErrNone, verifyActiveJobStatus( &fileContext, &pFinalFile, &shouldUpdate ) );
+    TEST_ASSERT_EQUAL( OtaJobParseErrNone,
+                       verifyActiveJobStatus( &fileContext,
+                                              &pFinalFile,
+                                              &shouldUpdate ) );
 }
 
-/* This test is to check if the library handles the situation where the size of the
- * file downloaded using OTA is greater than the maximum size supported by the library. */
+/* This test is to check if the library handles the situation where the size of
+ * the file downloaded using OTA is greater than the maximum size supported by
+ * the library. */
 void test_OTA_overflowFileSize()
 {
     pOtaJobDoc = JOB_DOC_FILESIZE_OVERFLOW;
@@ -3734,12 +4080,13 @@ void test_OTA_overflowFileSize()
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
 }
 
-/* This test is to check if the number of ota packets received by the device does not
- * exceed the maximum limit of its datatype. */
+/* This test is to check if the number of ota packets received by the device
+ * does not exceed the maximum limit of its datatype. */
 void test_OTA_packetsProcessedOverflow()
 {
     OtaEventMsg_t otaEvent;
-    OtaEventData_t eventBuffers[ OTA_TEST_FILE_NUM_BLOCKS * OTA_TEST_DUPLICATE_NUM_BLOCKS ];
+    OtaEventData_t eventBuffers[ OTA_TEST_FILE_NUM_BLOCKS *
+                                 OTA_TEST_DUPLICATE_NUM_BLOCKS ];
     uint8_t pFileBlock[ OTA_FILE_BLOCK_SIZE ] = { 0 };
     uint8_t pStreamingMessage[ OTA_FILE_BLOCK_SIZE * 2 ] = { 0 };
     size_t streamingMessageSize = 0;
@@ -3750,8 +4097,9 @@ void test_OTA_packetsProcessedOverflow()
     otaGoToState( OtaAgentStateWaitingForFileBlock );
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForFileBlock, OTA_GetState() );
 
-    /* Set the event send interface to a mock function that allows events to be sent continuously
-     * because we're receiving multiple blocks in this test. */
+    /* Set the event send interface to a mock function that allows events to be
+     * sent continuously because we're receiving multiple blocks in this test.
+     */
     otaInterfaces.os.event.send = mockOSEventSend;
 
     /* Fill the file block. */
@@ -3765,22 +4113,27 @@ void test_OTA_packetsProcessedOverflow()
 
     while( remainingBytes >= 0 )
     {
-        /* Intentionally send duplicate blocks to test if we are handling it correctly. */
+        /* Intentionally send duplicate blocks to test if we are handling it
+         * correctly. */
         for( dupIdx = 0; dupIdx < OTA_TEST_DUPLICATE_NUM_BLOCKS; dupIdx++ )
         {
             /* Construct a AWS IoT streaming message. */
-            createOtaStreamingMessage(
-                pStreamingMessage,
-                sizeof( pStreamingMessage ),
-                idx,
-                pFileBlock,
-                min( ( uint32_t ) remainingBytes, OTA_FILE_BLOCK_SIZE ),
-                &streamingMessageSize,
-                true );
+            createOtaStreamingMessage( pStreamingMessage,
+                                       sizeof( pStreamingMessage ),
+                                       idx,
+                                       pFileBlock,
+                                       min( ( uint32_t ) remainingBytes,
+                                            OTA_FILE_BLOCK_SIZE ),
+                                       &streamingMessageSize,
+                                       true );
 
             otaEvent.eventId = OtaAgentEventReceivedFileBlock;
-            otaEvent.pEventData = &eventBuffers[ idx * OTA_TEST_DUPLICATE_NUM_BLOCKS + dupIdx ];
-            memcpy( otaEvent.pEventData->data, pStreamingMessage, streamingMessageSize );
+            otaEvent
+                .pEventData = &eventBuffers[ idx * OTA_TEST_DUPLICATE_NUM_BLOCKS +
+                                             dupIdx ];
+            memcpy( otaEvent.pEventData->data,
+                    pStreamingMessage,
+                    streamingMessageSize );
             otaEvent.pEventData->dataLength = streamingMessageSize;
             OTA_SignalEvent( &otaEvent );
         }
@@ -3796,18 +4149,21 @@ void test_OTA_packetsProcessedOverflow()
 
     processEntireQueue();
 
-    /* OTA agent should complete the update and go back to waiting for job state. */
+    /* OTA agent should complete the update and go back to waiting for job
+     * state. */
     receiveAndProcessOtaEvent();
 
     /* Check if received complete file. */
     for( idx = 0; idx < OTA_TEST_FILE_SIZE; ++idx )
     {
-        TEST_ASSERT_EQUAL( pFileBlock[ idx % sizeof( pFileBlock ) ], pOtaFileBuffer[ idx ] );
+        TEST_ASSERT_EQUAL( pFileBlock[ idx % sizeof( pFileBlock ) ],
+                           pOtaFileBuffer[ idx ] );
     }
 }
 
-/* This test is to check if the library handles the situation where the length of the
- * job name downloaded using OTA is greater than the maximum size supported by the library. */
+/* This test is to check if the library handles the situation where the length
+ * of the job name downloaded using OTA is greater than the maximum size
+ * supported by the library. */
 void test_OTA_jobIdMaxLength()
 {
     pOtaJobDoc = JOB_DOC_INVALID_JOB_ID_LEN_MAX;
@@ -3821,8 +4177,9 @@ void test_OTA_jobIdMaxLength()
     TEST_ASSERT_EQUAL( OtaAgentStateWaitingForJob, OTA_GetState() );
 }
 
-/* Enlarge job name and size in doc param to simulate if the size of pJobNameBuffer in ota.c
- * and pActiveJobName in OtaAgentContext_t is different. */
+/* Enlarge job name and size in doc param to simulate if the size of
+ * pJobNameBuffer in ota.c and pActiveJobName in OtaAgentContext_t is different.
+ */
 void test_OTA_jobBufferLargerThanpActiveJobName()
 {
     pOtaJobDoc = JOB_DOC_INVALID_JOB_ID_LEN_MAX;
@@ -3832,7 +4189,8 @@ void test_OTA_jobBufferLargerThanpActiveJobName()
 
     /* Initialize JOB Id buffer .*/
     otaAgent.fileContext.pJobName = pLargerJobNameBuffer;
-    otaAgent.fileContext.jobNameMaxSize = ( uint16_t ) sizeof( pLargerJobNameBuffer );
+    otaAgent.fileContext.jobNameMaxSize = ( uint16_t ) sizeof(
+        pLargerJobNameBuffer );
 
     otaReceiveJobDocument();
     receiveAndProcessOtaEvent();

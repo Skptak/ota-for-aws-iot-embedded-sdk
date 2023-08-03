@@ -11,31 +11,29 @@
  * length maxlen. The length excludes the null-byte.
  */
 
-
 #include <stdlib.h>
 
 /**
  * Stub strnlen used by CBMC.
  */
-size_t strnlen( const char * s,
-                size_t maxlen )
+size_t strnlen( const char * s, size_t maxlen )
 {
-    #ifdef __CPROVER_STRING_ABSTRACTION
-        __CPROVER_precondition( __CPROVER_is_zero_string( s ), "strnlen zero-termination" );
-        return __CPROVER_zero_string_length( s );
-    #else
-        size_t len = 0;
+#ifdef __CPROVER_STRING_ABSTRACTION
+    __CPROVER_precondition( __CPROVER_is_zero_string( s ),
+                            "strnlen zero-termination" );
+    return __CPROVER_zero_string_length( s );
+#else
+    size_t len = 0;
 
-        while( s[ len ] != 0 && len < maxlen )
-        {
-            len++;
-        }
-        return len;
-    #endif
+    while( s[ len ] != 0 && len < maxlen )
+    {
+        len++;
+    }
+    return len;
+#endif
 }
 
-size_t __builtin___strnlen_chk( const char * s,
-                                size_t maxlen )
+size_t __builtin___strnlen_chk( const char * s, size_t maxlen )
 {
     return strnlen( s, maxlen );
 }

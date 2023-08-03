@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -30,8 +31,8 @@
 
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
-#include "timers.h"
 #include "queue.h"
+#include "timers.h"
 
 /* OTA OS POSIX Interface Includes.*/
 #include "ota_os_freertos.h"
@@ -41,10 +42,11 @@
 #include "ota_private.h"
 
 /* OTA Event queue attributes.*/
-#define MAX_MESSAGES    20
-#define MAX_MSG_SIZE    sizeof( OtaEventMsg_t )
+#define MAX_MESSAGES 20
+#define MAX_MSG_SIZE sizeof( OtaEventMsg_t )
 
-/* Array containing pointer to the OTA event structures used to send events to the OTA task. */
+/* Array containing pointer to the OTA event structures used to send events to
+ * the OTA task. */
 static OtaEventMsg_t queueData[ MAX_MESSAGES * MAX_MSG_SIZE ];
 
 /* The queue control structure.  .*/
@@ -62,7 +64,8 @@ static TimerHandle_t otaTimer[ OtaNumOfTimers ];
 /* OTA Timer callbacks.*/
 static void requestTimerCallback( TimerHandle_t T );
 static void selfTestTimerCallback( TimerHandle_t T );
-void ( * timerCallback[ OtaNumOfTimers ] )( TimerHandle_t T ) = { requestTimerCallback, selfTestTimerCallback };
+void ( *timerCallback[ OtaNumOfTimers ] )(
+    TimerHandle_t T ) = { requestTimerCallback, selfTestTimerCallback };
 
 OtaOsStatus_t OtaInitEvent_FreeRTOS( OtaEventContext_t * pEventCtx )
 {
@@ -294,7 +297,8 @@ OtaOsStatus_t OtaStopTimer_FreeRTOS( OtaTimerId_t otaTimerId )
 
         if( retVal == pdTRUE )
         {
-            LogDebug( ( "OTA Timer Stopped for Timerid=%d.", ( int ) otaTimerId ) );
+            LogDebug(
+                ( "OTA Timer Stopped for Timerid=%d.", ( int ) otaTimerId ) );
         }
         else
         {
@@ -308,7 +312,8 @@ OtaOsStatus_t OtaStopTimer_FreeRTOS( OtaTimerId_t otaTimerId )
     }
     else
     {
-        LogWarn( ( "OTA Timer handle NULL for Timerid=%d, can't stop.", ( int ) otaTimerId ) );
+        LogWarn( ( "OTA Timer handle NULL for Timerid=%d, can't stop.",
+                   ( int ) otaTimerId ) );
     }
 
     return otaOsStatus;
@@ -343,7 +348,8 @@ OtaOsStatus_t OtaDeleteTimer_FreeRTOS( OtaTimerId_t otaTimerId )
     {
         otaOsStatus = OtaOsTimerDeleteFailed;
 
-        LogWarn( ( "OTA Timer handle NULL for Timerid=%d, can't delete.", ( int ) otaTimerId ) );
+        LogWarn( ( "OTA Timer handle NULL for Timerid=%d, can't delete.",
+                   ( int ) otaTimerId ) );
     }
 
     return otaOsStatus;

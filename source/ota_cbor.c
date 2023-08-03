@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -27,14 +28,14 @@
  * @brief CBOR encode/decode routines for AWS IoT Over-the-Air updates.
  */
 
-#include <stdlib.h>
 #include "cbor.h"
 #include "ota_cbor_private.h"
+#include <stdlib.h>
 
 /**
  * @brief Number of keys in cbor get stream request message.
  */
-#define OTA_CBOR_GETSTREAMREQUEST_ITEM_COUNT    6
+#define OTA_CBOR_GETSTREAMREQUEST_ITEM_COUNT 6
 
 /* ========================================================================== */
 
@@ -86,11 +87,8 @@ bool OTA_CBOR_Decode_GetStreamResponseMessage( const uint8_t * pMessageBuffer,
     CborValue cborValue, cborMap;
     size_t payloadSizeReceived = 0;
 
-    if( ( pFileId == NULL ) ||
-        ( pBlockId == NULL ) ||
-        ( pBlockSize == NULL ) ||
-        ( pPayload == NULL ) ||
-        ( pPayloadSize == NULL ) ||
+    if( ( pFileId == NULL ) || ( pBlockId == NULL ) || ( pBlockSize == NULL ) ||
+        ( pPayload == NULL ) || ( pPayloadSize == NULL ) ||
         ( pMessageBuffer == NULL ) )
     {
         cborResult = CborUnknownError;
@@ -131,8 +129,7 @@ bool OTA_CBOR_Decode_GetStreamResponseMessage( const uint8_t * pMessageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_value_get_int( &cborValue,
-                                         ( int * ) pFileId );
+        cborResult = cbor_value_get_int( &cborValue, ( int * ) pFileId );
     }
 
     /* Find the block ID. */
@@ -150,8 +147,7 @@ bool OTA_CBOR_Decode_GetStreamResponseMessage( const uint8_t * pMessageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_value_get_int( &cborValue,
-                                         ( int * ) pBlockId );
+        cborResult = cbor_value_get_int( &cborValue, ( int * ) pBlockId );
     }
 
     /* Find the block size. */
@@ -169,8 +165,7 @@ bool OTA_CBOR_Decode_GetStreamResponseMessage( const uint8_t * pMessageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_value_get_int( &cborValue,
-                                         ( int * ) pBlockSize );
+        cborResult = cbor_value_get_int( &cborValue, ( int * ) pBlockSize );
     }
 
     /* Find the payload bytes. */
@@ -195,7 +190,8 @@ bool OTA_CBOR_Decode_GetStreamResponseMessage( const uint8_t * pMessageBuffer,
 
     if( CborNoError == cborResult )
     {
-        /* Check if the received payload size is less than or equal to buffer size. */
+        /* Check if the received payload size is less than or equal to buffer
+         * size. */
         if( payloadSizeReceived <= ( *pPayloadSize ) )
         {
             *pPayloadSize = payloadSizeReceived;
@@ -231,7 +227,8 @@ bool OTA_CBOR_Decode_GetStreamResponseMessage( const uint8_t * pMessageBuffer,
  * @param[in] blockOffset Value of block offset in the encoded message.
  * @param[in] pBlockBitmap bitmap in the encoded message.
  * @param[in] blockBitmapSize Size of the provided bitmap buffer.
- * @param[in] numOfBlocksRequested number of blocks to request in the encoded message.
+ * @param[in] numOfBlocksRequested number of blocks to request in the encoded
+ * message.
  *
  * @return TRUE when success, otherwise FALSE.
  */
@@ -249,10 +246,8 @@ bool OTA_CBOR_Encode_GetStreamRequestMessage( uint8_t * pMessageBuffer,
     CborError cborResult = CborNoError;
     CborEncoder cborEncoder, cborMapEncoder;
 
-    if( ( pMessageBuffer == NULL ) ||
-        ( pEncodedMessageSize == NULL ) ||
-        ( pClientToken == NULL ) ||
-        ( pBlockBitmap == NULL ) )
+    if( ( pMessageBuffer == NULL ) || ( pEncodedMessageSize == NULL ) ||
+        ( pClientToken == NULL ) || ( pBlockBitmap == NULL ) )
     {
         cborResult = CborUnknownError;
     }
@@ -260,13 +255,11 @@ bool OTA_CBOR_Encode_GetStreamRequestMessage( uint8_t * pMessageBuffer,
     /* Initialize the CBOR encoder. */
     if( CborNoError == cborResult )
     {
-        cbor_encoder_init( &cborEncoder,
-                           pMessageBuffer,
-                           messageBufferSize,
-                           0 );
-        cborResult = cbor_encoder_create_map( &cborEncoder,
-                                              &cborMapEncoder,
-                                              OTA_CBOR_GETSTREAMREQUEST_ITEM_COUNT );
+        cbor_encoder_init( &cborEncoder, pMessageBuffer, messageBufferSize, 0 );
+        cborResult = cbor_encoder_create_map(
+            &cborEncoder,
+            &cborMapEncoder,
+            OTA_CBOR_GETSTREAMREQUEST_ITEM_COUNT );
     }
 
     /* Encode the client token key and value. */
@@ -278,8 +271,7 @@ bool OTA_CBOR_Encode_GetStreamRequestMessage( uint8_t * pMessageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_encode_text_stringz( &cborMapEncoder,
-                                               pClientToken );
+        cborResult = cbor_encode_text_stringz( &cborMapEncoder, pClientToken );
     }
 
     /* Encode the file ID key and value. */
@@ -291,8 +283,7 @@ bool OTA_CBOR_Encode_GetStreamRequestMessage( uint8_t * pMessageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_encode_int( &cborMapEncoder,
-                                      fileId );
+        cborResult = cbor_encode_int( &cborMapEncoder, fileId );
     }
 
     /* Encode the block size key and value. */
@@ -304,8 +295,7 @@ bool OTA_CBOR_Encode_GetStreamRequestMessage( uint8_t * pMessageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_encode_int( &cborMapEncoder,
-                                      blockSize );
+        cborResult = cbor_encode_int( &cborMapEncoder, blockSize );
     }
 
     /* Encode the block offset key and value. */
@@ -317,8 +307,7 @@ bool OTA_CBOR_Encode_GetStreamRequestMessage( uint8_t * pMessageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_encode_int( &cborMapEncoder,
-                                      blockOffset );
+        cborResult = cbor_encode_int( &cborMapEncoder, blockOffset );
     }
 
     /* Encode the block bitmap key and value. */
@@ -344,8 +333,7 @@ bool OTA_CBOR_Encode_GetStreamRequestMessage( uint8_t * pMessageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_encode_int( &cborMapEncoder,
-                                      numOfBlocksRequested );
+        cborResult = cbor_encode_int( &cborMapEncoder, numOfBlocksRequested );
     }
 
     /* Close the encoder. */

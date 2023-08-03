@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -39,7 +40,7 @@
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 /* *INDENT-ON* */
 
@@ -63,28 +64,30 @@
 /**
  * @brief The number of words allocated to the stack for the OTA agent.
  *
- * The configuration parameter specifies the size of the stack that will be allocated
- * to the task being created (the size is specified in words, not bytes!). The amount
- * of stack required is dependent on the application specific parameters,
- * for more information [Link](https://www.freertos.org/FAQMem.html#StackSize)
+ * The configuration parameter specifies the size of the stack that will be
+ * allocated to the task being created (the size is specified in words, not
+ * bytes!). The amount of stack required is dependent on the application
+ * specific parameters, for more information
+ * [Link](https://www.freertos.org/FAQMem.html#StackSize)
  *
  * <b>Possible values:</b> Any positive 32 bit integer. <br>
  * <b>Default value:</b> Varies by platform
  */
 #ifndef otaconfigSTACK_SIZE
-    #define otaconfigSTACK_SIZE    "Please set otaconfigSTACK_SIZE"
+    #define otaconfigSTACK_SIZE "Please set otaconfigSTACK_SIZE"
 #endif
 
 /**
  * @brief The OTA agent task priority. Normally it runs at a low priority.
  *
- * For more information [Link](https://www.freertos.org/RTOS-task-priority.html).
+ * For more information
+ * [Link](https://www.freertos.org/RTOS-task-priority.html).
  *
  * <b>Possible values:</b> 0 to ( configMAX_PRIORITIES - 1 ) <br>
  * <b>Default value:</b> Varies by platform.
  */
 #ifndef otaconfigAGENT_PRIORITY
-    #define otaconfigAGENT_PRIORITY    "Please set otaconfigAGENT_PRIORITY"
+    #define otaconfigAGENT_PRIORITY "Please set otaconfigAGENT_PRIORITY"
 #endif
 
 /**
@@ -95,7 +98,7 @@
  * <b>Default value:</b> '12'
  */
 #ifndef otaconfigLOG2_FILE_BLOCK_SIZE
-    #define otaconfigLOG2_FILE_BLOCK_SIZE    12UL
+    #define otaconfigLOG2_FILE_BLOCK_SIZE 12UL
 #endif
 
 /**
@@ -105,7 +108,7 @@
  * <b>Default value:</b> '128'
  */
 #ifndef otaconfigMAX_BLOCK_BITMAP_SIZE
-    #define otaconfigMAX_BLOCK_BITMAP_SIZE    128U
+    #define otaconfigMAX_BLOCK_BITMAP_SIZE 128U
 #endif
 
 /**
@@ -116,7 +119,7 @@
  * <b>Default value:</b> '16000'
  */
 #ifndef otaconfigSELF_TEST_RESPONSE_WAIT_MS
-    #define otaconfigSELF_TEST_RESPONSE_WAIT_MS    16000U
+    #define otaconfigSELF_TEST_RESPONSE_WAIT_MS 16000U
 #endif
 
 /**
@@ -131,7 +134,7 @@
  * <b>Default value:</b> '10000'
  */
 #ifndef otaconfigFILE_REQUEST_WAIT_MS
-    #define otaconfigFILE_REQUEST_WAIT_MS    10000U
+    #define otaconfigFILE_REQUEST_WAIT_MS 10000U
 #endif
 
 /**
@@ -147,11 +150,11 @@
  * see the AWS IoT Core Quotas here -
  * https://console.aws.amazon.com/servicequotas/home/services/iotcore/quotas/L-83BC2FA9
  *
- * <b>Possible values:</b> Any unsigned 32 integer - though practical limit is 128 <br>
- * <b>Default value:</b> '128'
+ * <b>Possible values:</b> Any unsigned 32 integer - though practical limit is
+ * 128 <br> <b>Default value:</b> '128'
  */
 #ifndef otaconfigMAX_THINGNAME_LEN
-    #define otaconfigMAX_THINGNAME_LEN    128U
+    #define otaconfigMAX_THINGNAME_LEN 128U
 #endif
 
 /**
@@ -171,7 +174,7 @@
  * <b>Default value:</b> '1'
  */
 #ifndef otaconfigMAX_NUM_BLOCKS_REQUEST
-    #define otaconfigMAX_NUM_BLOCKS_REQUEST    1U
+    #define otaconfigMAX_NUM_BLOCKS_REQUEST 1U
 #endif
 
 /**
@@ -186,21 +189,21 @@
  * <b>Default value:</b> '32'
  */
 #ifndef otaconfigMAX_NUM_REQUEST_MOMENTUM
-    #define otaconfigMAX_NUM_REQUEST_MOMENTUM    32U
+    #define otaconfigMAX_NUM_REQUEST_MOMENTUM 32U
 #endif
 
 /**
  * @brief How frequently the device will report its OTA progress to the cloud.
  *
- * @note Device will update the job status with the number of blocks it has received every certain
- * number of blocks it receives. For example, 64 means device will update job status every 64 blocks
- * it receives.
+ * @note Device will update the job status with the number of blocks it has
+ * received every certain number of blocks it receives. For example, 64 means
+ * device will update job status every 64 blocks it receives.
  *
  * <b>Possible values:</b> Any unsigned 32 integer. <br>
  * <b>Default value:</b> '64'
  */
 #ifndef otaconfigOTA_UPDATE_STATUS_FREQUENCY
-    #define otaconfigOTA_UPDATE_STATUS_FREQUENCY    64U
+    #define otaconfigOTA_UPDATE_STATUS_FREQUENCY 64U
 #endif
 
 /**
@@ -213,7 +216,7 @@
  * <b>Default value:</b> '1'
  */
 #ifndef otaconfigMAX_NUM_OTA_DATA_BUFFERS
-    #define otaconfigMAX_NUM_OTA_DATA_BUFFERS    1U
+    #define otaconfigMAX_NUM_OTA_DATA_BUFFERS 1U
 #endif
 
 /**
@@ -227,9 +230,9 @@
  */
 #ifndef otaconfigOTA_FILE_TYPE
     #if defined( WIN32 ) || defined( __linux__ )
-        #define otaconfigOTA_FILE_TYPE    FILE
+        #define otaconfigOTA_FILE_TYPE FILE
     #else
-        #define otaconfigOTA_FILE_TYPE    uint8_t
+        #define otaconfigOTA_FILE_TYPE uint8_t
     #endif
 #endif
 
@@ -246,7 +249,7 @@
  * <b>Default value:</b> '0'
  */
 #ifndef otaconfigAllowDowngrade
-    #define otaconfigAllowDowngrade    0U
+    #define otaconfigAllowDowngrade 0U
 #endif
 
 /**
@@ -259,7 +262,7 @@
  *
  */
 #ifndef configOTA_FIRMWARE_UPDATE_FILE_TYPE_ID
-    #define configOTA_FIRMWARE_UPDATE_FILE_TYPE_ID    0U
+    #define configOTA_FIRMWARE_UPDATE_FILE_TYPE_ID 0U
 #endif
 
 /**
@@ -274,7 +277,7 @@
  * <b>Default value:</b> 'OTA_CONTROL_OVER_MQTT'
  */
 #ifndef configENABLED_CONTROL_PROTOCOL
-    #define configENABLED_CONTROL_PROTOCOL    ( OTA_CONTROL_OVER_MQTT )
+    #define configENABLED_CONTROL_PROTOCOL ( OTA_CONTROL_OVER_MQTT )
 #endif
 
 /**
@@ -286,11 +289,11 @@
  * <b>Possible values:</b><br>
  * Enable data over MQTT - ( OTA_DATA_OVER_MQTT ) <br>
  * Enable data over HTTP - ( OTA_DATA_OVER_HTTP ) <br>
- * Enable data over both MQTT & HTTP - ( OTA_DATA_OVER_MQTT | OTA_DATA_OVER_HTTP ) <br>
- * <b>Default value:</b> 'OTA_DATA_OVER_MQTT'
+ * Enable data over both MQTT & HTTP - ( OTA_DATA_OVER_MQTT | OTA_DATA_OVER_HTTP
+ * ) <br> <b>Default value:</b> 'OTA_DATA_OVER_MQTT'
  */
 #ifndef configENABLED_DATA_PROTOCOLS
-    #define configENABLED_DATA_PROTOCOLS    ( OTA_DATA_OVER_MQTT )
+    #define configENABLED_DATA_PROTOCOLS ( OTA_DATA_OVER_MQTT )
 #endif
 
 /**
@@ -305,24 +308,25 @@
  * <b>Default value:</b>  'OTA_DATA_OVER_MQTT'
  */
 #ifndef configOTA_PRIMARY_DATA_PROTOCOL
-    #define configOTA_PRIMARY_DATA_PROTOCOL    ( OTA_DATA_OVER_MQTT )
+    #define configOTA_PRIMARY_DATA_PROTOCOL ( OTA_DATA_OVER_MQTT )
 #endif
 
 /**
- * @brief The polling timeout (milliseconds) to receive messages from event queue.
+ * @brief The polling timeout (milliseconds) to receive messages from event
+ * queue.
  *
  * <b>Possible values:</b> Any unsigned 32 integer. <br>
  * <b>Default value:</b> '1000'
  */
 #ifndef configOTA_POLLING_EVENTS_TIMEOUT_MS
-    #define configOTA_POLLING_EVENTS_TIMEOUT_MS    ( 1000U )
+    #define configOTA_POLLING_EVENTS_TIMEOUT_MS ( 1000U )
 #endif
 
 /**
  * @brief Whether to use const qualifier for the appFirmwareVersion variable.
  *
- * @note In some cases the appFirmwareVersion variable cannot be declared as const
- * because the version is read out during runtime.
+ * @note In some cases the appFirmwareVersion variable cannot be declared as
+ * const because the version is read out during runtime.
  *
  * <b>Possible values:</b><br>
  * appFirmwareVersion is const - ( 0 ) <br>
@@ -330,7 +334,7 @@
  * <b>Default value:</b>  '0'
  */
 #ifndef OTA_USE_NONCONST_APPVERSION
-    #define OTA_USE_NONCONST_APPVERSION    ( 0U )
+    #define OTA_USE_NONCONST_APPVERSION ( 0U )
 #endif
 
 /**
@@ -345,7 +349,8 @@
  * wrapped in double parentheses to be ISO C89/C90 standard compliant. For a
  * reference POSIX implementation of the logging macros, refer to the ota
  * default config file, and the logging-stack in demos folder of the
- * [AWS IoT Embedded C SDK repository](https://github.com/aws/aws-iot-device-sdk-embedded-C/tree/main).
+ * [AWS IoT Embedded C SDK
+ * repository](https://github.com/aws/aws-iot-device-sdk-embedded-C/tree/main).
  *
  * <b>Default value</b>: Error logging is turned off, and no code is generated
  * for calls to the macro in the OTA library on compilation.
@@ -366,7 +371,8 @@
  * wrapped in double parentheses to be ISO C89/C90 standard compliant. For a
  * reference POSIX implementation of the logging macros, refer to the ota
  * default config file, and the logging-stack in demos folder of the
- * [AWS IoT Embedded C SDK repository](https://github.com/aws/aws-iot-device-sdk-embedded-C/tree/main).
+ * [AWS IoT Embedded C SDK
+ * repository](https://github.com/aws/aws-iot-device-sdk-embedded-C/tree/main).
  *
  * <b>Default value</b>: Warning logging is turned off, and no code is
  * generated for calls to the macro in the OTA library on compilation.
@@ -387,7 +393,8 @@
  * wrapped in double parentheses to be ISO C89/C90 standard compliant. For a
  * reference POSIX implementation of the logging macros, refer to the ota
  * default config file, and the logging-stack in demos folder of the
- * [AWS IoT Embedded C SDK repository](https://github.com/aws/aws-iot-device-sdk-embedded-C/tree/main).
+ * [AWS IoT Embedded C SDK
+ * repository](https://github.com/aws/aws-iot-device-sdk-embedded-C/tree/main).
  *
  * <b>Default value</b>: Info logging is turned off, and no code is
  * generated for calls to the macro in the OTA library on compilation.
@@ -408,7 +415,8 @@
  * wrapped in double parentheses to be ISO C89/C90 standard compliant. For a
  * reference POSIX implementation of the logging macros, refer to the ota
  * default config file, and the logging-stack in demos folder of the
- * [AWS IoT Embedded C SDK repository](https://github.com/aws/aws-iot-device-sdk-embedded-C/tree/main).
+ * [AWS IoT Embedded C SDK
+ * repository](https://github.com/aws/aws-iot-device-sdk-embedded-C/tree/main).
  *
  * <b>Default value</b>: Debug logging is turned off, and no code is
  * generated for calls to the macro in the OTA library on compilation.
@@ -419,7 +427,7 @@
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    }
+}
 #endif
 /* *INDENT-ON* */
 

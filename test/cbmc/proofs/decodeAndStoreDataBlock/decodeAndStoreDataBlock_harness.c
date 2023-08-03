@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -43,8 +44,8 @@ extern IngestResult_t decodeAndStoreDataBlock( OtaFileContext_t * pFileContext,
 
 void decodeAndStoreDataBlock_harness()
 {
-    /* fileContext is initialized to otaAgent.pFileContext which is statically defined in ota.c and
-     * hence can never be NULL. */
+    /* fileContext is initialized to otaAgent.pFileContext which is statically
+     * defined in ota.c and hence can never be NULL. */
     OtaInterfaces_t otaInterface;
     OtaFileContext_t fileContext;
     uint8_t pRawMsg[ OTA_DATA_BLOCK_SIZE ];
@@ -65,20 +66,29 @@ void decodeAndStoreDataBlock_harness()
 
     otaDataInterface.decodeFileBlock = decodeFileBlockStub;
 
-    /* otaAgent.pOtaInterface can never be NULL as it is always checked at the start of the OTA
-     * Agent specifically in receiveAndProcessOTAEvent function.*/
+    /* otaAgent.pOtaInterface can never be NULL as it is always checked at the
+     * start of the OTA Agent specifically in receiveAndProcessOTAEvent
+     * function.*/
     otaAgent.pOtaInterface = &otaInterface;
 
     if( otaAgent.fileContext.decodeMemMaxSize != 0u )
     {
-        otaAgent.fileContext.pDecodeMem = ( uint8_t * ) malloc( 1UL << otaconfigLOG2_FILE_BLOCK_SIZE );
+        otaAgent.fileContext.pDecodeMem = ( uint8_t * ) malloc(
+            1UL << otaconfigLOG2_FILE_BLOCK_SIZE );
     }
 
-    result = decodeAndStoreDataBlock( &fileContext, pRawMsg, msgSize, &pPayload, &blockSize, &blockIndex );
+    result = decodeAndStoreDataBlock( &fileContext,
+                                      pRawMsg,
+                                      msgSize,
+                                      &pPayload,
+                                      &blockSize,
+                                      &blockIndex );
 
     __CPROVER_assert( ( result >= IngestResultUninitialized ) &&
-                      ( result <= IngestResultDuplicate_Continue ),
-                      "Invalid return value from decodeAndStoreDataBlock:Expected value should be from IngestResult_t enum." );
+                          ( result <= IngestResultDuplicate_Continue ),
+                      "Invalid return value from "
+                      "decodeAndStoreDataBlock:Expected value should be from "
+                      "IngestResult_t enum." );
 
     if( pPayload != NULL )
     {

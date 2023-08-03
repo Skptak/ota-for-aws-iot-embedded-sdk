@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -33,10 +34,9 @@
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 /* *INDENT-ON* */
-
 
 /**
  * @otaosfipage
@@ -58,7 +58,8 @@
  * <br>
  *
  * The functions that must be implemented are:<br>
- * - [OTA OS Functional Interface Initialize Event Mechanism](@ref OtaInitEvent_t)
+ * - [OTA OS Functional Interface Initialize Event Mechanism](@ref
+ * OtaInitEvent_t)
  * - [OTA OS Functional Interface Send Event](@ref OtaSendEvent_t)
  * - [OTA OS Functional Interface Receive Event](@ref OtaReceiveEvent_t)
  * - [OTA OS Functional Interface Deinitialize Event](@ref OtaDeinitEvent_t)
@@ -99,16 +100,20 @@ typedef enum
  */
 typedef enum OtaOsStatus
 {
-    OtaOsSuccess = 0,                    /*!< @brief OTA OS interface success. */
-    OtaOsEventQueueCreateFailed = 0x80U, /*!< @brief Failed to create the event queue. */
-    OtaOsEventQueueSendFailed,           /*!< @brief Posting event message to the event queue failed. */
-    OtaOsEventQueueReceiveFailed,        /*!< @brief Failed to receive from the event queue. */
-    OtaOsEventQueueDeleteFailed,         /*!< @brief Failed to delete the event queue. */
-    OtaOsTimerCreateFailed,              /*!< @brief Failed to create the timer. */
-    OtaOsTimerStartFailed,               /*!< @brief Failed to create the timer. */
-    OtaOsTimerRestartFailed,             /*!< @brief Failed to restart the timer. */
-    OtaOsTimerStopFailed,                /*!< @brief Failed to stop the timer. */
-    OtaOsTimerDeleteFailed               /*!< @brief Failed to delete the timer. */
+    OtaOsSuccess = 0, /*!< @brief OTA OS interface success. */
+    OtaOsEventQueueCreateFailed = 0x80U, /*!< @brief Failed to create the event
+                                            queue. */
+    OtaOsEventQueueSendFailed,    /*!< @brief Posting event message to the event
+                                     queue failed. */
+    OtaOsEventQueueReceiveFailed, /*!< @brief Failed to receive from the event
+                                     queue. */
+    OtaOsEventQueueDeleteFailed,  /*!< @brief Failed to delete the event queue.
+                                   */
+    OtaOsTimerCreateFailed,       /*!< @brief Failed to create the timer. */
+    OtaOsTimerStartFailed,        /*!< @brief Failed to create the timer. */
+    OtaOsTimerRestartFailed,      /*!< @brief Failed to restart the timer. */
+    OtaOsTimerStopFailed,         /*!< @brief Failed to stop the timer. */
+    OtaOsTimerDeleteFailed        /*!< @brief Failed to delete the timer. */
 } OtaOsStatus_t;
 
 /**
@@ -118,10 +123,11 @@ typedef enum OtaOsStatus
  *
  * @param[pEventCtx]     Pointer to the OTA event context.
  *
- * @return               OtaOsStatus_t, OtaOsSuccess if success , other error code on failure.
+ * @return               OtaOsStatus_t, OtaOsSuccess if success , other error
+ * code on failure.
  */
 
-typedef OtaOsStatus_t ( * OtaInitEvent_t ) ( OtaEventContext_t * pEventCtx );
+typedef OtaOsStatus_t ( *OtaInitEvent_t )( OtaEventContext_t * pEventCtx );
 
 /**
  * @brief Sends an OTA event.
@@ -132,14 +138,16 @@ typedef OtaOsStatus_t ( * OtaInitEvent_t ) ( OtaEventContext_t * pEventCtx );
  *
  * @param[pEventMsg]     Event to be sent to the OTA handler.
  *
- * @param[timeout]       The maximum amount of time (msec) the task should block.
+ * @param[timeout]       The maximum amount of time (msec) the task should
+ * block.
  *
- * @return               OtaOsStatus_t, OtaOsSuccess if success , other error code on failure.
+ * @return               OtaOsStatus_t, OtaOsSuccess if success , other error
+ * code on failure.
  */
 
-typedef OtaOsStatus_t ( * OtaSendEvent_t )( OtaEventContext_t * pEventCtx,
-                                            const void * pEventMsg,
-                                            unsigned int timeout );
+typedef OtaOsStatus_t ( *OtaSendEvent_t )( OtaEventContext_t * pEventCtx,
+                                           const void * pEventMsg,
+                                           unsigned int timeout );
 
 /**
  * @brief Receive an OTA event.
@@ -150,14 +158,16 @@ typedef OtaOsStatus_t ( * OtaSendEvent_t )( OtaEventContext_t * pEventCtx,
  *
  * @param[pEventMsg]     Pointer to store message.
  *
- * @param[timeout]       The maximum amount of time (msec) the task should block.
+ * @param[timeout]       The maximum amount of time (msec) the task should
+ * block.
  *
- * @return               OtaOsStatus_t, OtaOsSuccess if success , other error code on failure.
+ * @return               OtaOsStatus_t, OtaOsSuccess if success , other error
+ * code on failure.
  */
 
-typedef OtaOsStatus_t ( * OtaReceiveEvent_t )( OtaEventContext_t * pEventCtx,
-                                               void * pEventMsg,
-                                               uint32_t timeout );
+typedef OtaOsStatus_t ( *OtaReceiveEvent_t )( OtaEventContext_t * pEventCtx,
+                                              void * pEventMsg,
+                                              uint32_t timeout );
 
 /**
  * @brief Deinitialize the OTA Events mechanism.
@@ -167,10 +177,11 @@ typedef OtaOsStatus_t ( * OtaReceiveEvent_t )( OtaEventContext_t * pEventCtx,
  *
  * @param[pEventCtx]     Pointer to the OTA event context.
  *
- * @return               OtaOsStatus_t, OtaOsSuccess if success , other error code on failure.
+ * @return               OtaOsStatus_t, OtaOsSuccess if success , other error
+ * code on failure.
  */
 
-typedef OtaOsStatus_t ( * OtaDeinitEvent_t )( OtaEventContext_t * pEventCtx );
+typedef OtaOsStatus_t ( *OtaDeinitEvent_t )( OtaEventContext_t * pEventCtx );
 
 /**
  * @brief Timer callback.
@@ -179,10 +190,11 @@ typedef OtaOsStatus_t ( * OtaDeinitEvent_t )( OtaEventContext_t * pEventCtx );
  *
  * @param[otaTimerId]       Timer ID of type otaTimerId_t
  *
- * @return                  OtaOsStatus_t, OtaOsSuccess if success , other error code on failure.
+ * @return                  OtaOsStatus_t, OtaOsSuccess if success , other error
+ * code on failure.
  */
 
-typedef void ( * OtaTimerCallback_t )( OtaTimerId_t otaTimerId );
+typedef void ( *OtaTimerCallback_t )( OtaTimerId_t otaTimerId );
 
 /**
  * @brief Start timer.
@@ -197,13 +209,14 @@ typedef void ( * OtaTimerCallback_t )( OtaTimerId_t otaTimerId );
  *
  * @param[callback]         Callback to be called when timer expires.
  *
- * @return                  OtaOsStatus_t, OtaOsSuccess if success , other error code on failure.
+ * @return                  OtaOsStatus_t, OtaOsSuccess if success , other error
+ * code on failure.
  */
 
-typedef OtaOsStatus_t ( * OtaStartTimer_t ) ( OtaTimerId_t otaTimerId,
-                                              const char * const pTimerName,
-                                              const uint32_t timeout,
-                                              OtaTimerCallback_t callback );
+typedef OtaOsStatus_t ( *OtaStartTimer_t )( OtaTimerId_t otaTimerId,
+                                            const char * const pTimerName,
+                                            const uint32_t timeout,
+                                            OtaTimerCallback_t callback );
 
 /**
  * @brief Stop timer.
@@ -212,10 +225,11 @@ typedef OtaOsStatus_t ( * OtaStartTimer_t ) ( OtaTimerId_t otaTimerId,
  *
  * @param[otaTimerId]     Timer ID of type otaTimerId_t
  *
- * @return                OtaOsStatus_t, OtaOsSuccess if success , other error code on failure.
+ * @return                OtaOsStatus_t, OtaOsSuccess if success , other error
+ * code on failure.
  */
 
-typedef OtaOsStatus_t ( * OtaStopTimer_t ) ( OtaTimerId_t otaTimerId );
+typedef OtaOsStatus_t ( *OtaStopTimer_t )( OtaTimerId_t otaTimerId );
 
 /**
  * @brief Delete a timer.
@@ -224,10 +238,11 @@ typedef OtaOsStatus_t ( * OtaStopTimer_t ) ( OtaTimerId_t otaTimerId );
  *
  * @param[otaTimerId]       Timer ID of type otaTimerId_t
  *
- * @return                  OtaOsStatus_t, OtaOsSuccess if success , other error code on failure.
+ * @return                  OtaOsStatus_t, OtaOsSuccess if success , other error
+ * code on failure.
  */
 
-typedef OtaOsStatus_t ( * OtaDeleteTimer_t ) ( OtaTimerId_t otaTimerId );
+typedef OtaOsStatus_t ( *OtaDeleteTimer_t )( OtaTimerId_t otaTimerId );
 
 /**
  * @brief Allocate memory.
@@ -236,25 +251,26 @@ typedef OtaOsStatus_t ( * OtaDeleteTimer_t ) ( OtaTimerId_t otaTimerId );
  *
  * @param[size]        This is the size of the memory block, in bytes..
  *
- * @return             This function returns a pointer to the allocated memory, or NULL if
- *                     the request fails.
+ * @return             This function returns a pointer to the allocated memory,
+ * or NULL if the request fails.
  */
 
-typedef void * ( * OtaMalloc_t ) ( size_t size );
+typedef void * ( *OtaMalloc_t )( size_t size );
 
 /**
  * @brief Free memory.
  *
- * This function deallocates the memory previously allocated by a call to allocation
- * function of type OtaMalloc_t.
+ * This function deallocates the memory previously allocated by a call to
+ * allocation function of type OtaMalloc_t.
  *
- * @param[ptr]         This is the pointer to a memory block previously allocated with function
- *                     of type OtaMalloc_t. If a null pointer is passed as argument, no action occurs.
+ * @param[ptr]         This is the pointer to a memory block previously
+ * allocated with function of type OtaMalloc_t. If a null pointer is passed as
+ * argument, no action occurs.
  *
  * @return             None.
  */
 
-typedef void ( * OtaFree_t ) ( void * ptr );
+typedef void ( *OtaFree_t )( void * ptr );
 
 /**
  * @ingroup ota_struct_types
@@ -266,7 +282,8 @@ typedef struct OtaEventInterface
     OtaSendEvent_t send;               /*!< @brief Send data. */
     OtaReceiveEvent_t recv;            /*!< @brief Receive data. */
     OtaDeinitEvent_t deinit;           /*!< @brief Deinitialize event. */
-    OtaEventContext_t * pEventContext; /*!< @brief Event context to store event information. */
+    OtaEventContext_t * pEventContext; /*!< @brief Event context to store event
+                                          information. */
 } OtaEventInterface_t;
 
 /**
@@ -275,13 +292,13 @@ typedef struct OtaEventInterface
  */
 typedef struct OtaTimerInterface
 {
-    OtaStartTimer_t start;            /*!< @brief Timer start state. */
-    OtaStopTimer_t stop;              /*!< @brief Timer stop state. */
-    #ifndef __cplusplus
-        OtaDeleteTimer_t delete;      /*!< @brief Delete timer. */
-    #else
-        OtaDeleteTimer_t deleteTimer; /*!< @brief Delete timer for C++ builds. */
-    #endif
+    OtaStartTimer_t start; /*!< @brief Timer start state. */
+    OtaStopTimer_t stop;   /*!< @brief Timer stop state. */
+#ifndef __cplusplus
+    OtaDeleteTimer_t delete; /*!< @brief Delete timer. */
+#else
+    OtaDeleteTimer_t deleteTimer; /*!< @brief Delete timer for C++ builds. */
+#endif
 } OtaTimerInterface_t;
 
 /**
@@ -291,11 +308,15 @@ typedef struct OtaTimerInterface
 typedef struct OtaMallocInterface
 {
     /* MISRA Ref 21.3.2 [Use of free or malloc] */
-    /* More details at: https://github.com/aws/ota-for-aws-iot-embedded-sdk/blob/main/MISRA.md#rule-213 */
+    /* More details at:
+     * https://github.com/aws/ota-for-aws-iot-embedded-sdk/blob/main/MISRA.md#rule-213
+     */
     /* coverity[misra_c_2012_rule_21_3_violation] */
     OtaMalloc_t malloc; /*!< @brief OTA memory allocate interface. */
     /* MISRA Ref 21.3.2 [Use of free or malloc] */
-    /* More details at: https://github.com/aws/ota-for-aws-iot-embedded-sdk/blob/main/MISRA.md#rule-213 */
+    /* More details at:
+     * https://github.com/aws/ota-for-aws-iot-embedded-sdk/blob/main/MISRA.md#rule-213
+     */
     /* coverity[misra_c_2012_rule_21_3_violation] */
     OtaFree_t free; /*!< @brief OTA memory deallocate interface. */
 } OtaMallocInterface_t;
@@ -313,7 +334,7 @@ typedef struct OtaOSInterface
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    }
+}
 #endif
 /* *INDENT-ON* */
 

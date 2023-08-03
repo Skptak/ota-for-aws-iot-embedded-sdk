@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -27,19 +28,19 @@
  * @brief Unit tests for functions in ota_os_posix.c
  */
 
-#include <string.h>
-#include <mqueue.h>
-#include <unistd.h>
 #include "unity.h"
+#include <mqueue.h>
+#include <string.h>
+#include <unistd.h>
 
 /* For accessing OTA private functions and error codes. */
 #include "ota.h"
 #include "ota_os_posix.h"
 
 /* Testing constants. */
-#define TIMER_NAME             "dummy_name"
-#define OTA_DEFAULT_TIMEOUT    1000 /*!< Timeout in milliseconds. */
-#define NS_TO_S( ns )    ( ns / 1000000000.0 )
+#define TIMER_NAME          "dummy_name"
+#define OTA_DEFAULT_TIMEOUT 1000 /*!< Timeout in milliseconds. */
+#define NS_TO_S( ns )       ( ns / 1000000000.0 )
 
 /* Interfaces for Timer and Event. */
 static OtaTimerInterface_t timer;
@@ -97,7 +98,8 @@ void test_OTA_posix_SendAndRecvEvent( void )
 }
 
 /**
- * @brief Test that the event queue operations do not succeed for invalid operations.
+ * @brief Test that the event queue operations do not succeed for invalid
+ * operations.
  */
 void test_OTA_posix_InvalidEventQueue( void )
 {
@@ -117,9 +119,13 @@ void test_OTA_posix_InvalidEventQueue( void )
 void timerCreateAndStop( OtaTimerId_t timer_id )
 {
     OtaOsStatus_t result = OtaOsSuccess;
-    int wait = 2 * OTA_DEFAULT_TIMEOUT; /* Wait for 2 times of the timeout specified. */
+    int wait = 2 * OTA_DEFAULT_TIMEOUT; /* Wait for 2 times of the timeout
+                                           specified. */
 
-    result = timer.start( timer_id, TIMER_NAME, OTA_DEFAULT_TIMEOUT, timerCallback );
+    result = timer.start( timer_id,
+                          TIMER_NAME,
+                          OTA_DEFAULT_TIMEOUT,
+                          timerCallback );
     TEST_ASSERT_EQUAL( OtaOsSuccess, result );
 
     /* Wait for the timer callback to be invoked. */
@@ -222,12 +228,14 @@ void test_OTA_posix_RecvEventTimeout( void )
     if( tsEndTime.tv_nsec - tsStartTime.tv_nsec < 0 )
     {
         timeDiffSec = tsEndTime.tv_sec - tsStartTime.tv_sec - 1;
-        timeDiffSec += NS_TO_S( ( double ) ( 1000000000 + tsEndTime.tv_nsec - tsStartTime.tv_nsec ) );
+        timeDiffSec += NS_TO_S( ( double ) ( 1000000000 + tsEndTime.tv_nsec -
+                                             tsStartTime.tv_nsec ) );
     }
     else
     {
         timeDiffSec = tsEndTime.tv_sec - tsStartTime.tv_sec;
-        timeDiffSec += NS_TO_S( ( double ) ( tsEndTime.tv_nsec - tsStartTime.tv_nsec ) );
+        timeDiffSec += NS_TO_S(
+            ( double ) ( tsEndTime.tv_nsec - tsStartTime.tv_nsec ) );
     }
 
     /* The time may not accurate enough, so - 1 as buffer. */

@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -29,14 +30,16 @@
 /* Include headers for mqtt interface. */
 #include "ota_mqtt_private.h"
 
-#define OTA_STATUS_MSG_MAX_SIZE    128U                 /*!< Max length of a job status message to the service. */
+#define OTA_STATUS_MSG_MAX_SIZE \
+    128U /*!< Max length of a job status message to the service. */
 
-uint32_t __CPROVER_file_local_ota_mqtt_c_prvBuildStatusMessageFinish( char * pMsgBuffer,
-                                                                      size_t msgBufferSize,
-                                                                      OtaJobStatus_t status,
-                                                                      int32_t reason,
-                                                                      int32_t subReason,
-                                                                      uint32_t previousVersion );
+uint32_t __CPROVER_file_local_ota_mqtt_c_prvBuildStatusMessageFinish(
+    char * pMsgBuffer,
+    size_t msgBufferSize,
+    OtaJobStatus_t status,
+    int32_t reason,
+    int32_t subReason,
+    uint32_t previousVersion );
 
 /* Stub required to populate and generate strings for testing the function. */
 size_t __CPROVER_file_local_ota_mqtt_c_stringBuilder( char * pBuffer,
@@ -45,13 +48,14 @@ size_t __CPROVER_file_local_ota_mqtt_c_stringBuilder( char * pBuffer,
 {
     size_t stringSize;
 
-    /* pBuffer is initialized in updateJobStatus_Mqtt function before passing it to the
-    * stringBuilder function in prvBuildStatusMessageFinish and thus cannot be NULL. */
+    /* pBuffer is initialized in updateJobStatus_Mqtt function before passing it
+     * to the stringBuilder function in prvBuildStatusMessageFinish and thus
+     * cannot be NULL. */
     __CPROVER_assert( pBuffer != NULL,
                       "Unable to use pBuffer: passed pointer value is NULL." );
 
-    /* strings is initialized prvBuildStatusMessageFinish function before passing it to the
-     * stringBuilder function and thus cannot be NULL. */
+    /* strings is initialized prvBuildStatusMessageFinish function before
+     * passing it to the stringBuilder function and thus cannot be NULL. */
     __CPROVER_assert( strings != NULL,
                       "Unable to use strings: passed pointer value is NULL." );
 
@@ -63,9 +67,10 @@ size_t __CPROVER_file_local_ota_mqtt_c_stringBuilder( char * pBuffer,
     return stringSize;
 }
 /* Stub required to convert a hexadecimal number into a string. */
-size_t __CPROVER_file_local_ota_mqtt_c_stringBuilderUInt32Hex( char * pBuffer,
-                                                               size_t bufferSizeBytes,
-                                                               uint32_t value )
+size_t __CPROVER_file_local_ota_mqtt_c_stringBuilderUInt32Hex(
+    char * pBuffer,
+    size_t bufferSizeBytes,
+    uint32_t value )
 {
     size_t buffersize;
 
@@ -73,9 +78,10 @@ size_t __CPROVER_file_local_ota_mqtt_c_stringBuilderUInt32Hex( char * pBuffer,
 }
 
 /* Stub required to convert a decimal number into a string. */
-size_t __CPROVER_file_local_ota_mqtt_c_stringBuilderUInt32Decimal( char * pBuffer,
-                                                                   size_t bufferSizeBytes,
-                                                                   uint32_t value )
+size_t __CPROVER_file_local_ota_mqtt_c_stringBuilderUInt32Decimal(
+    char * pBuffer,
+    size_t bufferSizeBytes,
+    uint32_t value )
 {
     size_t buffersize;
 
@@ -98,17 +104,26 @@ void prvBuildStatusMessageFinish_harness()
     msgSize = OTA_STATUS_MSG_MAX_SIZE;
 
     /* The prvBuildStatusMessageFinish function is only called when status
-     * is not equal to JobStatusInProgress and the value is less than NumJobStatusMappings. */
+     * is not equal to JobStatusInProgress and the value is less than
+     * NumJobStatusMappings. */
     __CPROVER_assume( status > 0 && status < NumJobStatusMappings );
 
-    /* reason is of OtaJobReason_t datatype it follows the values ranging from 0 to 6.*/
+    /* reason is of OtaJobReason_t datatype it follows the values ranging from 0
+     * to 6.*/
     __CPROVER_assume( reason >= 0 && reason < 6 );
 
-    /* previousVersion is typecasted to int32_t and expects values less than INT32_MAX. */
+    /* previousVersion is typecasted to int32_t and expects values less than
+     * INT32_MAX. */
     __CPROVER_assume( previousVersion < INT32_MAX );
 
     /* subReason is typecasted to uint32_t and expects values greater than 0. */
     __CPROVER_assume( subReason > 0 );
 
-    ( void ) __CPROVER_file_local_ota_mqtt_c_prvBuildStatusMessageFinish( pMsg, msgSize, status, reason, subReason, previousVersion );
+    ( void ) __CPROVER_file_local_ota_mqtt_c_prvBuildStatusMessageFinish(
+        pMsg,
+        msgSize,
+        status,
+        reason,
+        subReason,
+        previousVersion );
 }

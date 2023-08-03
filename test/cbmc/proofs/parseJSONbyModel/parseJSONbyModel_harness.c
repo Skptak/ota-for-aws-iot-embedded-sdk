@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -27,8 +28,8 @@
  * @brief Implements the proof harness for parseJSONbyModel function.
  */
 /*  Ota Agent includes. */
-#include "ota.h"
 #include "core_json.h"
+#include "ota.h"
 
 extern OtaAgentContext_t otaAgent;
 extern JsonDocParam_t otaJobDocModelParamStructure[ OTA_NUM_JOB_PARAMS ];
@@ -37,15 +38,17 @@ extern DocParseErr_t parseJSONbyModel( const char * pJson,
                                        JsonDocModel_t * pDocModel );
 
 /* Initialize the src key for JSON files. */
-const char OTA_JsonFileSignatureKey[ OTA_FILE_SIG_KEY_STR_MAX_LENGTH ] = "sig-sha256-ecdsa";
+const char
+    OTA_JsonFileSignatureKey[ OTA_FILE_SIG_KEY_STR_MAX_LENGTH ] = "sig-sha256-"
+                                                                  "ecdsa";
 
 /* Stub to validate the JSON string. */
-DocParseErr_t validateJSON( const char * pJson,
-                            uint32_t messageLength )
+DocParseErr_t validateJSON( const char * pJson, uint32_t messageLength )
 {
     DocParseErr_t parseErr;
 
-    __CPROVER_assume( ( parseErr >= DocParseErrUnknown ) && ( parseErr <= DocParseErrInvalidToken ) );
+    __CPROVER_assume( ( parseErr >= DocParseErrUnknown ) &&
+                      ( parseErr <= DocParseErrInvalidToken ) );
 
     return parseErr;
 }
@@ -81,13 +84,16 @@ DocParseErr_t extractParameter( JsonDocParam_t docParam,
 
     /* pContextBase and pValueInJson are defined in parseJSONbyModel function
      * before calling extractParameter.*/
-    __CPROVER_assert( pContextBase != NULL, "Error: Expected a non-NULL pContextBase value. " );
-    __CPROVER_assert( pValueInJson != NULL, "Error: Expected a non-NULL pValueInJson value. " );
+    __CPROVER_assert( pContextBase != NULL,
+                      "Error: Expected a non-NULL pContextBase value. " );
+    __CPROVER_assert( pValueInJson != NULL,
+                      "Error: Expected a non-NULL pValueInJson value. " );
 
     return parseErr;
 }
 
-/* Stub to Check if all the required parameters for job document are extracted from the JSON. */
+/* Stub to Check if all the required parameters for job document are extracted
+ * from the JSON. */
 DocParseErr_t verifyRequiredParamsExtracted( const JsonDocParam_t * pModelParam,
                                              const JsonDocModel_t * pDocModel )
 {
@@ -95,8 +101,10 @@ DocParseErr_t verifyRequiredParamsExtracted( const JsonDocParam_t * pModelParam,
 
     /* pModelParam and pDocModel are defined in parseJSONbyModel function
      * before calling extractParameter.*/
-    __CPROVER_assert( pModelParam != NULL, "Error: Expected a non-NULL pContextBase value. " );
-    __CPROVER_assert( pDocModel != NULL, "Error: Expected a non-NULL pValueInJson value. " );
+    __CPROVER_assert( pModelParam != NULL,
+                      "Error: Expected a non-NULL pContextBase value. " );
+    __CPROVER_assert( pDocModel != NULL,
+                      "Error: Expected a non-NULL pValueInJson value. " );
 
     return parseErr;
 }
@@ -122,9 +130,11 @@ void parseJSONbyModel_harness()
     /* Length of the message cannot exceed the size of the message buffer. */
     __CPROVER_assume( messageLength < OTA_DATA_BLOCK_SIZE );
 
-    /* Initialize the array of document model body functions. This is always initialized
-     * before passing to parseJSONbyModel function and hence cannot be NULL. */
-    modelParams = ( JsonDocParam_t * ) malloc( sizeof( JsonDocParam_t ) * numParams );
+    /* Initialize the array of document model body functions. This is always
+     * initialized before passing to parseJSONbyModel function and hence cannot
+     * be NULL. */
+    modelParams = ( JsonDocParam_t * ) malloc( sizeof( JsonDocParam_t ) *
+                                               numParams );
     __CPROVER_assume( modelParams != NULL );
 
     /* Havoc object to non-deterministically set all the bytes in the

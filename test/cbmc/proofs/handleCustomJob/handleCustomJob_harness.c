@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -27,12 +28,12 @@
  * @brief Implements the proof harness for handleCustomJob function.
  */
 /*  Ota Agent includes. */
+#include "core_json.h"
 #include "ota.h"
-#include "stubs.h"
 #include "ota_interface_private.h"
+#include "stubs.h"
 #include <stdlib.h>
 #include <string.h>
-#include "core_json.h"
 
 extern OtaAgentContext_t otaAgent;
 extern OtaControlInterface_t otaControlInterface;
@@ -59,24 +60,26 @@ JSONStatus_t JSON_SearchConst( const char * buf,
 
     jobId = ( const uint8_t * ) malloc( sizeof( uint8_t ) * jobIdLength );
 
-    /* jobId cannot be NULL as it is statically initialize in the handleCustomJob function.*/
+    /* jobId cannot be NULL as it is statically initialize in the
+     * handleCustomJob function.*/
     __CPROVER_assume( jobId != NULL );
 
     *outValue = jobId;
     *outValueLength = jobIdLength;
 
-    __CPROVER_assume( ( status >= JSONPartial ) && ( status <= JSONBadParameter ) );
+    __CPROVER_assume( ( status >= JSONPartial ) &&
+                      ( status <= JSONBadParameter ) );
     return status;
 }
 
 /* Stub which changes the parseErr in the job document structure. */
-void otaAppCallbackStub( OtaJobEvent_t eEvent,
-                         const void * pData )
+void otaAppCallbackStub( OtaJobEvent_t eEvent, const void * pData )
 {
     OtaJobDocument_t * jobDoc = ( OtaJobDocument_t * ) pData;
     OtaJobParseErr_t parseErr;
 
-    __CPROVER_assume( ( parseErr <= OtaJobParseErrNoActiveJobs ) && ( parseErr >= OtaJobParseErrUnknown ) );
+    __CPROVER_assume( ( parseErr <= OtaJobParseErrNoActiveJobs ) &&
+                      ( parseErr >= OtaJobParseErrUnknown ) );
 
     jobDoc->parseErr = parseErr;
 }

@@ -4,48 +4,50 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /* Standard includes. */
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 /* CBOR and OTA includes. */
 #include "ota.h"
-#include "ota_private.h"
 #include "ota_cbor_private.h"
+#include "ota_private.h"
 
 /* Unity framework includes. */
-#include "unity_fixture.h"
 #include "unity.h"
+#include "unity_fixture.h"
 
 /* test includes. */
 #include "utest_helpers.h"
 
-#define CBOR_TEST_MESSAGE_BUFFER_SIZE    ( OTA_FILE_BLOCK_SIZE * 2 )
-#define CBOR_TEST_BITMAP_VALUE           0xAAAAAAAA
-#define CBOR_TEST_BLOCKIDENTITY_VALUE    0
+#define CBOR_TEST_MESSAGE_BUFFER_SIZE ( OTA_FILE_BLOCK_SIZE * 2 )
+#define CBOR_TEST_BITMAP_VALUE        0xAAAAAAAA
+#define CBOR_TEST_BLOCKIDENTITY_VALUE 0
 
 /* ========================================================================== */
 
 /**
- * @brief Test OTA_CBOR_Encode_GetStreamRequestMessage() encodes a message correctly.
+ * @brief Test OTA_CBOR_Encode_GetStreamRequestMessage() encodes a message
+ * correctly.
  *
  */
 void test_OTA_CborEncodeStreamRequest()
@@ -56,13 +58,51 @@ void test_OTA_CborEncodeStreamRequest()
     uint32_t numBlocksRequest = otaconfigMAX_NUM_BLOCKS_REQUEST;
 
     /* CBOR representation of a json get stream request message,
-     * {"c": "ThisIsAClientToken", "f": 1, "l": 4096, "o": 0, "b": b"\xaa\xaa\xaa\xaa", "n": numBlocksRequest} */
-    uint8_t expectedData[] =
-    {
-        0xa6, 0x61, 0x63, 0x72, 0x54, 0x68, 0x69, 0x73, 0x49, 0x73, 0x41, 0x43, 0x6c, 0x69, 0x65,
-        0x6e, 0x74, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x61, 0x66, 0x1,  0x61, 0x6c, 0x19, 0x10, 0x0,
-        0x61, 0x6f, 0x0,  0x61, 0x62, 0x44, 0xaa, 0xaa, 0xaa, 0xaa, 0x61, 0x6e, numBlocksRequest
-    };
+     * {"c": "ThisIsAClientToken", "f": 1, "l": 4096, "o": 0, "b":
+     * b"\xaa\xaa\xaa\xaa", "n": numBlocksRequest} */
+    uint8_t expectedData[] = { 0xa6,
+                               0x61,
+                               0x63,
+                               0x72,
+                               0x54,
+                               0x68,
+                               0x69,
+                               0x73,
+                               0x49,
+                               0x73,
+                               0x41,
+                               0x43,
+                               0x6c,
+                               0x69,
+                               0x65,
+                               0x6e,
+                               0x74,
+                               0x54,
+                               0x6f,
+                               0x6b,
+                               0x65,
+                               0x6e,
+                               0x61,
+                               0x66,
+                               0x1,
+                               0x61,
+                               0x6c,
+                               0x19,
+                               0x10,
+                               0x0,
+                               0x61,
+                               0x6f,
+                               0x0,
+                               0x61,
+                               0x62,
+                               0x44,
+                               0xaa,
+                               0xaa,
+                               0xaa,
+                               0xaa,
+                               0x61,
+                               0x6e,
+                               numBlocksRequest };
 
     bool result = OTA_CBOR_Encode_GetStreamRequestMessage(
         cborWork,                          /* output message buffer. */
@@ -88,7 +128,8 @@ void test_OTA_CborEncodeStreamRequest()
 }
 
 /**
- * @brief Test OTA_CBOR_Decode_GetStreamResponseMessage() decodes a message correctly.
+ * @brief Test OTA_CBOR_Decode_GetStreamResponseMessage() decodes a message
+ * correctly.
  *
  */
 void test_OTA_CborDecodeStreamResponse()
@@ -113,25 +154,23 @@ void test_OTA_CborDecodeStreamResponse()
     }
 
     /* Encode the above payload. */
-    result = createOtaStreamingMessage(
-        cborWork,
-        sizeof( cborWork ),
-        CBOR_TEST_BLOCKIDENTITY_VALUE,
-        blockPayload,
-        sizeof( blockPayload ),
-        &encodedSize,
-        msgValidity );
+    result = createOtaStreamingMessage( cborWork,
+                                        sizeof( cborWork ),
+                                        CBOR_TEST_BLOCKIDENTITY_VALUE,
+                                        blockPayload,
+                                        sizeof( blockPayload ),
+                                        &encodedSize,
+                                        msgValidity );
 
     TEST_ASSERT_EQUAL( CborNoError, result );
 
-    result = OTA_CBOR_Decode_GetStreamResponseMessage(
-        cborWork,
-        encodedSize,
-        &fileId,
-        &blockIndex,
-        &blockSize,
-        &pDecodedPayload,
-        &payloadSize );
+    result = OTA_CBOR_Decode_GetStreamResponseMessage( cborWork,
+                                                       encodedSize,
+                                                       &fileId,
+                                                       &blockIndex,
+                                                       &blockSize,
+                                                       &pDecodedPayload,
+                                                       &payloadSize );
 
     TEST_ASSERT_TRUE( result );
     TEST_ASSERT_EQUAL( CBOR_TEST_FILEIDENTITY_VALUE, fileId );
@@ -241,116 +280,107 @@ void test_OTA_CborDecodeStreamResponse_Invalid()
 
     /* Create an invalid message by encoding a string
      * instead of an integer for fileid. */
-    result = createOtaStreamingMessage(
-        cborWork,
-        sizeof( cborWork ),
-        CBOR_TEST_BLOCKIDENTITY_VALUE,
-        blockPayload,
-        sizeof( blockPayload ),
-        &encodedSize,
-        msgValidity );
+    result = createOtaStreamingMessage( cborWork,
+                                        sizeof( cborWork ),
+                                        CBOR_TEST_BLOCKIDENTITY_VALUE,
+                                        blockPayload,
+                                        sizeof( blockPayload ),
+                                        &encodedSize,
+                                        msgValidity );
     TEST_ASSERT_EQUAL( CborNoError, result );
 
-
-    result = OTA_CBOR_Decode_GetStreamResponseMessage(
-        cborWork,
-        encodedSize,
-        &fileId,
-        &blockIndex,
-        &blockSize,
-        &pDecodedPayload,
-        &payloadSize );
-    TEST_ASSERT_FALSE( result ); /* Decoding fails because fileid is of type CborString. */
+    result = OTA_CBOR_Decode_GetStreamResponseMessage( cborWork,
+                                                       encodedSize,
+                                                       &fileId,
+                                                       &blockIndex,
+                                                       &blockSize,
+                                                       &pDecodedPayload,
+                                                       &payloadSize );
+    TEST_ASSERT_FALSE( result ); /* Decoding fails because fileid is of type
+                                    CborString. */
 
     /* Test that decoding fails with invalid message buffer. */
-    result = OTA_CBOR_Decode_GetStreamResponseMessage(
-        NULL,
-        encodedSize,
-        &fileId,
-        &blockIndex,
-        &blockSize,
-        &pDecodedPayload,
-        &payloadSize );
+    result = OTA_CBOR_Decode_GetStreamResponseMessage( NULL,
+                                                       encodedSize,
+                                                       &fileId,
+                                                       &blockIndex,
+                                                       &blockSize,
+                                                       &pDecodedPayload,
+                                                       &payloadSize );
     TEST_ASSERT_FALSE( result );
 
     /* Test that decoding fails with invalid payload size. */
-    result = OTA_CBOR_Decode_GetStreamResponseMessage(
-        cborWork,
-        encodedSize,
-        &fileId,
-        &blockIndex,
-        &blockSize,
-        &pDecodedPayload,
-        NULL );
+    result = OTA_CBOR_Decode_GetStreamResponseMessage( cborWork,
+                                                       encodedSize,
+                                                       &fileId,
+                                                       &blockIndex,
+                                                       &blockSize,
+                                                       &pDecodedPayload,
+                                                       NULL );
     TEST_ASSERT_FALSE( result );
 
     /* Test that decoding fails with invalid payload buffer. */
-    result = OTA_CBOR_Decode_GetStreamResponseMessage(
-        cborWork,
-        encodedSize,
-        &fileId,
-        &blockIndex,
-        &blockSize,
-        NULL,
-        &payloadSize );
+    result = OTA_CBOR_Decode_GetStreamResponseMessage( cborWork,
+                                                       encodedSize,
+                                                       &fileId,
+                                                       &blockIndex,
+                                                       &blockSize,
+                                                       NULL,
+                                                       &payloadSize );
     TEST_ASSERT_FALSE( result );
 
     /* Test that decoding fails with invalid block size. */
-    result = OTA_CBOR_Decode_GetStreamResponseMessage(
-        cborWork,
-        encodedSize,
-        &fileId,
-        &blockIndex,
-        NULL,
-        &pDecodedPayload,
-        &payloadSize );
+    result = OTA_CBOR_Decode_GetStreamResponseMessage( cborWork,
+                                                       encodedSize,
+                                                       &fileId,
+                                                       &blockIndex,
+                                                       NULL,
+                                                       &pDecodedPayload,
+                                                       &payloadSize );
     TEST_ASSERT_FALSE( result );
 
     /* Test that decoding fails with invalid block id. */
-    result = OTA_CBOR_Decode_GetStreamResponseMessage(
-        cborWork,
-        encodedSize,
-        &fileId,
-        NULL,
-        &blockSize,
-        &pDecodedPayload,
-        &payloadSize );
+    result = OTA_CBOR_Decode_GetStreamResponseMessage( cborWork,
+                                                       encodedSize,
+                                                       &fileId,
+                                                       NULL,
+                                                       &blockSize,
+                                                       &pDecodedPayload,
+                                                       &payloadSize );
     TEST_ASSERT_FALSE( result );
 
     /* Test that decoding fails with invalid file index. */
-    result = OTA_CBOR_Decode_GetStreamResponseMessage(
-        cborWork,
-        encodedSize,
-        NULL,
-        &blockIndex,
-        &blockSize,
-        &pDecodedPayload,
-        &payloadSize );
+    result = OTA_CBOR_Decode_GetStreamResponseMessage( cborWork,
+                                                       encodedSize,
+                                                       NULL,
+                                                       &blockIndex,
+                                                       &blockSize,
+                                                       &pDecodedPayload,
+                                                       &payloadSize );
     TEST_ASSERT_FALSE( result );
 
-    /* Test that decoding fails when payload size(0) lesser than actual payload. */
+    /* Test that decoding fails when payload size(0) lesser than actual payload.
+     */
 
     msgValidity = true;
     payloadSize = 0;
 
-    result = createOtaStreamingMessage(
-        cborWork,
-        sizeof( cborWork ),
-        CBOR_TEST_BLOCKIDENTITY_VALUE,
-        blockPayload,
-        sizeof( blockPayload ),
-        &encodedSize,
-        msgValidity );
+    result = createOtaStreamingMessage( cborWork,
+                                        sizeof( cborWork ),
+                                        CBOR_TEST_BLOCKIDENTITY_VALUE,
+                                        blockPayload,
+                                        sizeof( blockPayload ),
+                                        &encodedSize,
+                                        msgValidity );
     TEST_ASSERT_EQUAL( CborNoError, result );
 
-    result = OTA_CBOR_Decode_GetStreamResponseMessage(
-        cborWork,
-        encodedSize,
-        &fileId,
-        &blockIndex,
-        &blockSize,
-        &pDecodedPayload,
-        &payloadSize );
+    result = OTA_CBOR_Decode_GetStreamResponseMessage( cborWork,
+                                                       encodedSize,
+                                                       &fileId,
+                                                       &blockIndex,
+                                                       &blockSize,
+                                                       &pDecodedPayload,
+                                                       &payloadSize );
     TEST_ASSERT_FALSE( result );
 }
 
@@ -371,19 +401,16 @@ void test_OTA_CborDecodeStreamResponse_InvalidMap()
     size_t payloadSize = -1;
     bool result = false;
 
-    result = createCborArray( cborWork,
-                              sizeof( cborWork ),
-                              &encodedSize );
+    result = createCborArray( cborWork, sizeof( cborWork ), &encodedSize );
 
     TEST_ASSERT_EQUAL( CborNoError, result );
 
-    result = OTA_CBOR_Decode_GetStreamResponseMessage(
-        cborWork,
-        encodedSize,
-        &fileId,
-        &blockIndex,
-        &blockSize,
-        &pDecodedPayload,
-        &payloadSize );
+    result = OTA_CBOR_Decode_GetStreamResponseMessage( cborWork,
+                                                       encodedSize,
+                                                       &fileId,
+                                                       &blockIndex,
+                                                       &blockSize,
+                                                       &pDecodedPayload,
+                                                       &payloadSize );
     TEST_ASSERT_FALSE( result );
 }

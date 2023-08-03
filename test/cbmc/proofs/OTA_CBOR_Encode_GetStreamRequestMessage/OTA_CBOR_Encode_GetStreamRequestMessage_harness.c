@@ -4,36 +4,41 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
  * @file OTA_CBOR_Encode_GetStreamRequestMessage_harness.c
- * @brief Implements the proof harness for OTA_CBOR_Encode_GetStreamRequestMessage function.
+ * @brief Implements the proof harness for
+ * OTA_CBOR_Encode_GetStreamRequestMessage function.
  */
 /* Include headers for cbor parsing. */
 #include "cbor.h"
 #include "ota_cbor_private.h"
 #include <stdlib.h>
 
-#define OTA_MAX_BLOCK_BITMAP_SIZE    128U                                                 /*!< @brief Max allowed number of bytes to track all blocks of an OTA file. Adjust block size if more range is needed. */
-#define OTA_REQUEST_MSG_MAX_SIZE     ( 3U * OTA_MAX_BLOCK_BITMAP_SIZE )                   /*!< @brief Maximum size of the message */
-
+#define OTA_MAX_BLOCK_BITMAP_SIZE                                              \
+    128U /*!< @brief Max allowed number of bytes to track all blocks of an OTA \
+            file. Adjust block size if more range is needed. */
+#define OTA_REQUEST_MSG_MAX_SIZE                                               \
+    ( 3U * OTA_MAX_BLOCK_BITMAP_SIZE ) /*!< @brief Maximum size of the message \
+                                        */
 
 /* Stub to initialize the encoder. */
 void cbor_encoder_init( CborEncoder * encoder,
@@ -54,8 +59,9 @@ CborError cbor_encoder_create_map( CborEncoder * encoder,
 }
 
 /* Stub to encode the text strings. */
-CborError __CPROVER_file_local_cbor_h_cbor_encode_text_stringz( CborEncoder * encoder,
-                                                                const char * string )
+CborError __CPROVER_file_local_cbor_h_cbor_encode_text_stringz(
+    CborEncoder * encoder,
+    const char * string )
 {
     CborError err;
 
@@ -63,8 +69,7 @@ CborError __CPROVER_file_local_cbor_h_cbor_encode_text_stringz( CborEncoder * en
 }
 
 /* Stub to encode integer values. */
-CborError cbor_encode_int( CborEncoder * encoder,
-                           int64_t value )
+CborError cbor_encode_int( CborEncoder * encoder, int64_t value )
 {
     CborError err;
 
@@ -82,8 +87,9 @@ CborError cbor_encode_byte_string( CborEncoder * encoder,
 }
 
 /* Stub to close the CBOR container. */
-CborError cbor_encoder_close_container_checked( CborEncoder * encoder,
-                                                const CborEncoder * containerEncoder )
+CborError cbor_encoder_close_container_checked(
+    CborEncoder * encoder,
+    const CborEncoder * containerEncoder )
 {
     CborError err;
 
@@ -91,8 +97,9 @@ CborError cbor_encoder_close_container_checked( CborEncoder * encoder,
 }
 
 /* Stub to return the size of buffer. */
-size_t __CPROVER_file_local_cbor_h_cbor_encoder_get_buffer_size( const CborEncoder * encoder,
-                                                                 const uint8_t * buffer )
+size_t __CPROVER_file_local_cbor_h_cbor_encoder_get_buffer_size(
+    const CborEncoder * encoder,
+    const uint8_t * buffer )
 {
     size_t bufferSize;
 
@@ -113,8 +120,10 @@ void OTA_CBOR_Encode_GetStreamRequestMessage_harness()
     int32_t numOfBlocksRequested;
     size_t clientTokenSize;
 
-    /* The pMessageBuffer pointer is pointing to an array of size messageBufferSize. */
-    pMessageBuffer = ( uint8_t * ) malloc( messageBufferSize * sizeof( uint8_t ) );
+    /* The pMessageBuffer pointer is pointing to an array of size
+     * messageBufferSize. */
+    pMessageBuffer = ( uint8_t * ) malloc( messageBufferSize *
+                                           sizeof( uint8_t ) );
 
     /* pEncodedMessage should be pointing to a valid location in the memory. */
     pEncodedMessageSize = ( size_t * ) malloc( sizeof( size_t ) );
@@ -126,9 +135,16 @@ void OTA_CBOR_Encode_GetStreamRequestMessage_harness()
     /* The pBlockBitmap is pointing to an array of size blockBitmapSize. */
     pBlockBitmap = ( uint8_t * ) malloc( blockBitmapSize * sizeof( uint8_t ) );
 
-    OTA_CBOR_Encode_GetStreamRequestMessage( pMessageBuffer, messageBufferSize, pEncodedMessageSize,
+    OTA_CBOR_Encode_GetStreamRequestMessage( pMessageBuffer,
+                                             messageBufferSize,
+                                             pEncodedMessageSize,
                                              pClientToken,
-                                             fileId, blockSize, blockOffset, pBlockBitmap, blockBitmapSize, numOfBlocksRequested );
+                                             fileId,
+                                             blockSize,
+                                             blockOffset,
+                                             pBlockBitmap,
+                                             blockBitmapSize,
+                                             numOfBlocksRequested );
 
     free( pMessageBuffer );
     free( pEncodedMessageSize );

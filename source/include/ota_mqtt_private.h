@@ -4,27 +4,29 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
  * @file ota_mqtt_private.h
- * @brief Contains function definitions of routines for OTA download and control using MQTT data plane.
+ * @brief Contains function definitions of routines for OTA download and control
+ * using MQTT data plane.
  */
 
 #ifndef OTA_MQTT_H
@@ -32,7 +34,7 @@
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 /* *INDENT-ON* */
 
@@ -56,8 +58,8 @@ OtaErr_t requestJob_Mqtt( const OtaAgentContext_t * pAgentCtx );
 /**
  * @brief Initialize file transfer over MQTT.
  *
- * This function initializes the file transfer after the OTA job is parsed and accepted
- * by subscribing to the data streaming topics.
+ * This function initializes the file transfer after the OTA job is parsed and
+ * accepted by subscribing to the data streaming topics.
  *
  * @param[in] pAgentCtx The OTA agent context.
  *
@@ -74,8 +76,8 @@ OtaErr_t initFileTransfer_Mqtt( const OtaAgentContext_t * pAgentCtx );
  *
  * @param[in] pAgentCtx The OTA agent context.
  *
- * @return The OTA PAL layer error code combined with the MCU specific error code. See OTA Agent
- * error codes information in ota.h.
+ * @return The OTA PAL layer error code combined with the MCU specific error
+ * code. See OTA Agent error codes information in ota.h.
  */
 
 OtaErr_t requestFileBlock_Mqtt( OtaAgentContext_t * pAgentCtx );
@@ -83,7 +85,8 @@ OtaErr_t requestFileBlock_Mqtt( OtaAgentContext_t * pAgentCtx );
 /**
  * @brief Decode a cbor encoded fileblock.
  *
- * This function is used for decoding a file block received over MQTT & encoded in cbor.
+ * This function is used for decoding a file block received over MQTT & encoded
+ * in cbor.
  *
  * @param[in] pMessageBuffer The message to be decoded.
  * @param[in] messageSize     The size of the message in bytes.
@@ -93,8 +96,8 @@ OtaErr_t requestFileBlock_Mqtt( OtaAgentContext_t * pAgentCtx );
  * @param[out] pPayload     The payload.
  * @param[out] pPayloadSize   The payload size.
  *
- * @return The OTA PAL layer error code combined with the MCU specific error code. See OTA Agent
- * error codes information in ota.h.
+ * @return The OTA PAL layer error code combined with the MCU specific error
+ * code. See OTA Agent error codes information in ota.h.
  */
 
 OtaErr_t decodeFileBlock_Mqtt( const uint8_t * pMessageBuffer,
@@ -134,12 +137,13 @@ OtaErr_t cleanupData_Mqtt( const OtaAgentContext_t * pAgentCtx );
 /**
  * @brief Update job status over MQTT.
  *
- * This function updates the OTA job status over MQTT with information like in progress, completion
- * or failure.
+ * This function updates the OTA job status over MQTT with information like in
+ * progress, completion or failure.
  *
  * @param[in] pAgentCtx The OTA agent context.
  *
- * @param[in] status The OTA job status which should be updated. @see OtaJobStatus_t.
+ * @param[in] status The OTA job status which should be updated. @see
+ * OtaJobStatus_t.
  *
  * @param[in] reason The major reason for the status update.
  *
@@ -164,7 +168,7 @@ const char * OTA_MQTT_strerror( OtaMqttStatus_t status );
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    }
+}
 #endif
 /* *INDENT-ON* */
 

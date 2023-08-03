@@ -4,22 +4,23 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -43,8 +44,10 @@ IngestResult_t ingestDataBlock( OtaFileContext_t * pFileContext,
     IngestResult_t result;
     OtaPalStatus_t status;
 
-    __CPROVER_assert( pFileContext != NULL, "Error: pFileContext cannot be NULL" );
-    __CPROVER_assert( pCloseResult != NULL, "Error: pCloseResult cannot be NULL" );
+    __CPROVER_assert( pFileContext != NULL,
+                      "Error: pFileContext cannot be NULL" );
+    __CPROVER_assert( pCloseResult != NULL,
+                      "Error: pCloseResult cannot be NULL" );
 
     return result;
 }
@@ -58,14 +61,14 @@ OtaErr_t updateStatus( OtaAgentContext_t * pAgentCtx,
     OtaErr_t err;
 
     __CPROVER_assert( pAgentCtx != NULL,
-                      "Error: Ota Agent has to be defined before calling updateJobStatus function." );
+                      "Error: Ota Agent has to be defined before calling "
+                      "updateJobStatus function." );
 
     return err;
 }
 
 /* Stub for callback function */
-void otaAppCallback( OtaJobEvent_t eEvent,
-                     const void * pData )
+void otaAppCallback( OtaJobEvent_t eEvent, const void * pData )
 {
 }
 
@@ -76,7 +79,8 @@ OtaPalStatus_t setImageState( OtaFileContext_t * const pFileContext,
     OtaPalStatus_t status;
 
     __CPROVER_assert( pFileContext != NULL,
-                      "Error: pFileContext is statically defined in otaAgent struct and cannot be NULL." );
+                      "Error: pFileContext is statically defined in otaAgent "
+                      "struct and cannot be NULL." );
 
     return status;
 }
@@ -89,8 +93,10 @@ OtaOsStatus_t start( OtaTimerId_t otaTimerId,
 {
     OtaOsStatus_t status;
 
-    __CPROVER_assert( ( otaTimerId != OtaRequestTimer ) || ( otaTimerId != OtaSelfTestTimer ),
-                      "Error: Invalid otaTimerId type. Expected OtaRequestTimer or OtaSelfTestTimer" );
+    __CPROVER_assert( ( otaTimerId != OtaRequestTimer ) ||
+                          ( otaTimerId != OtaSelfTestTimer ),
+                      "Error: Invalid otaTimerId type. Expected "
+                      "OtaRequestTimer or OtaSelfTestTimer" );
 
     return status;
 }
