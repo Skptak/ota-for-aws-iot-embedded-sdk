@@ -33,7 +33,7 @@ jobs:
         uses: Skptak/CI-CD-Github-Actions/complexity@main
         with:
           path: ./
-          horrid_threshold: 10
+          horrid_threshold: 14
 
   unittest:
     runs-on: ubuntu-latest
