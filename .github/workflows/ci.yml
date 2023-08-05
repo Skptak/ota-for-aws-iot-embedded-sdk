@@ -142,7 +142,7 @@ jobs:
       - name: Clone submodules
         run: git submodule update --init --recursive --checkout --depth 1
       - name: Install Python3
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: "3.11.0"
       - name: Measure sizes
