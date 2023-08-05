@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Check warnings
         run: |
           git submodule update --init --recursive --checkout --depth 1
@@ -26,7 +26,7 @@ jobs:
   complexity:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup
         run: sudo apt-get install complexity
       - name: Complexity
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build
         run: |
           git submodule update --init --recursive --checkout --depth 1
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Generate Build Files
         run: |
           git submodule update --init --recursive --checkout --depth 1
@@ -76,7 +76,7 @@ jobs:
   doxygen:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Run doxygen build
         uses: Skptak/CI-CD-Github-Actions/doxygen@main
         with:
@@ -86,12 +86,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Parent Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: main
           repository: aws/aws-iot-device-sdk-embedded-C
       - name: Clone This Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: tmp
       - name: Install spell
@@ -109,7 +109,7 @@ jobs:
   formatting:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Check formatting
         uses: Skptak/CI-CD-Github-Actions/formatting@main
         with:
@@ -119,11 +119,11 @@ jobs:
   git-secrets:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Checkout awslabs/git-secrets
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: awslabs/git-secrets
           ref: master
@@ -138,7 +138,7 @@ jobs:
   memory_statistics:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Clone submodules
         run: git submodule update --init --recursive --checkout --depth 1
       - name: Install Python3
