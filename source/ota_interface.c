@@ -92,12 +92,10 @@ OtaErr_t setDataInterface( OtaDataInterface_t * pDataInterface,
     bool httpInJobDoc;
     bool mqttInJobDoc;
 
-    httpInJobDoc = ( strstr( ( const char * ) pProtocol, "\"HTTP\"" ) != NULL )
-                       ? true
-                       : false;
-    mqttInJobDoc = ( strstr( ( const char * ) pProtocol, "\"MQTT\"" ) != NULL )
-                       ? true
-                       : false;
+    /* clang-format off */
+    httpInJobDoc = ( strstr( ( const char * ) pProtocol, "\"HTTP\"" ) != NULL ) ? true : false;
+    mqttInJobDoc = ( strstr( ( const char * ) pProtocol, "\"MQTT\"" ) != NULL ) ? true : false;
+    /* clang-format on */
 
 #if( ( configENABLED_DATA_PROTOCOLS & OTA_DATA_OVER_MQTT ) && \
      !( configENABLED_DATA_PROTOCOLS & OTA_DATA_OVER_HTTP ) )
