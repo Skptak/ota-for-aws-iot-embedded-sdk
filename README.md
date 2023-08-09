@@ -1,5 +1,7 @@
 # AWS IoT Over-the-air Update Library
 
+**[API Documentation Pages for current and previous releases of this library can be found here](https://aws.github.io/ota-for-aws-iot-embedded-sdk/)**
+
 The OTA library enables you to manage the notification of a newly available
 update, download the update, and perform cryptographic verification of the
 firmware update. Using the library, you can logically separate firmware updates
