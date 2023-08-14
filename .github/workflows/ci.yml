@@ -56,6 +56,7 @@ jobs:
     steps:
       - name: Clone This Repo
         uses: actions/checkout@v3
+
       - name: Generate Build Files
         run: |
           git submodule update --init --recursive --checkout --depth 1
@@ -63,13 +64,15 @@ jobs:
           cmake -S test -B build \
           -DCMAKE_BUILD_TYPE=Debug \
           -DCMAKE_C_FLAGS='--coverage -Wall -Wextra -DNDEBUG'
+
       - name: Run Coverage
         run: |
           cmake --build build/ --target coverage
+
       - name: Check Coverage
         uses: Skptak/CI-CD-Github-Actions/coverage-cop@main
         with:
-          path: ./build/coverage.info
+          coverage-file: ./build/coverage.info
           line-coverage-min: 100
           branch-coverage-min: 100
 
