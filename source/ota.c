@@ -2385,7 +2385,7 @@ static OtaJobParseErr_t handleCustomJob( const char * pJson,
                                            &jobDoc.jobIdLength,
                                            NULL ) ) )
     {
-        /* clang-format off*/
+        /* clang-format off */
         if( ( jobDoc.jobIdLength > 0U ) && ( jobDoc.jobIdLength < OTA_JOB_ID_MAX_SIZE ) ) /* LCOV_EXCL_BR_LINE */
         {
             /* clang-format on */
