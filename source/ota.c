@@ -2385,10 +2385,10 @@ static OtaJobParseErr_t handleCustomJob( const char * pJson,
                                            &jobDoc.jobIdLength,
                                            NULL ) ) )
     {
-        if( ( jobDoc.jobIdLength > 0U ) &&
-            ( jobDoc.jobIdLength < OTA_JOB_ID_MAX_SIZE ) ) /* LCOV_EXCL_BR_LINE
-                                                            */
+        /* clang-format off*/
+        if( ( jobDoc.jobIdLength > 0U ) && ( jobDoc.jobIdLength < OTA_JOB_ID_MAX_SIZE ) ) /* LCOV_EXCL_BR_LINE */
         {
+            /* clang-format on */
             jobDoc.pJobDocJson = ( const uint8_t * ) jobDocValue;
             jobDoc.pJobId = ( const uint8_t * ) jobIdValue;
             ( void ) memcpy( otaAgent.pActiveJobName,
@@ -2399,6 +2399,7 @@ static OtaJobParseErr_t handleCustomJob( const char * pJson,
              * control to a callback for parsing */
             callOtaCallback( OtaJobEventParseCustomJob, &jobDoc );
         }
+
         else
         {
             jobDoc.parseErr = OtaJobParseErrNonConformingJobDoc;
@@ -3950,13 +3951,12 @@ OtaState_t OTA_Shutdown( uint32_t ticksToWait, uint8_t unsubscribeFlag )
             /*
              * Wait for the OTA agent to complete shutdown, if requested.
              */
-            while( ( ticks > 0U ) &&
-                   ( otaAgent.state !=
-                     OtaAgentStateStopped ) ) /* LCOV_EXCL_BR_LINE
-                                               */
+            /* clang-format off */
+            while( ( ticks > 0U ) && ( otaAgent.state != OtaAgentStateStopped ) ) /* LCOV_EXCL_BR_LINE */
             {
                 ticks--;
             }
+            /* clang-format on */
         }
     }
     else
