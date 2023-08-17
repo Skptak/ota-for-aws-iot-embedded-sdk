@@ -30,7 +30,7 @@ jobs:
       - name: Setup
         run: sudo apt-get install complexity
       - name: Complexity
-        uses: Skptak/CI-CD-Github-Actions/complexity@main
+        uses: FreeRTOS/CI-CD-Github-Actions/complexity@CI-CD-Overhaul
         with:
           path: ./
           horrid_threshold: 14
@@ -70,7 +70,7 @@ jobs:
           cmake --build build/ --target coverage
 
       - name: Check Coverage
-        uses: Skptak/CI-CD-Github-Actions/coverage-cop@main
+        uses: FreeRTOS/CI-CD-Github-Actions/coverage-cop@CI-CD-Overhaul
         with:
           coverage-file: ./build/coverage.info
           line-coverage-min: 100
@@ -81,7 +81,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Run doxygen build
-        uses: Skptak/CI-CD-Github-Actions/doxygen@main
+        uses: FreeRTOS/CI-CD-Github-Actions/doxygen@CI-CD-Overhaul
         with:
           path: ./
 
@@ -149,7 +149,7 @@ jobs:
         with:
           python-version: "3.11.0"
       - name: Measure sizes
-        uses: Skptak/CI-CD-Github-Actions/memory_statistics@main
+        uses: FreeRTOS/CI-CD-Github-Actions/memory_statistics@CI-CD-Overhaul
         with:
           config: .github/memory_statistics_config.json
           check_against: docs/doxygen/include/size_table.md
@@ -161,7 +161,7 @@ jobs:
       - name: Check Links
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: Skptak/CI-CD-Github-Actions/link-verifier@main
+        uses: FreeRTOS/CI-CD-Github-Actions/link-verifier@CI-CD-Overhaul
         with:
           path: ./
 
@@ -184,10 +184,10 @@ jobs:
     runs-on: cbmc_ubuntu-latest_16-core
     steps:
       - name: Set up CBMC runner
-        uses: Skptak/CI-CD-Github-Actions/set_up_cbmc_runner@main
+        uses: FreeRTOS/CI-CD-Github-Actions/set_up_cbmc_runner@CI-CD-Overhaul
       - run: |
           git submodule update --init --checkout --recursive --depth 1
       - name: Run CBMC
-        uses: Skptak/CI-CD-Github-Actions/run_cbmc@main
+        uses: FreeRTOS/CI-CD-Github-Actions/run_cbmc@CI-CD-Overhaul
         with:
           proofs_dir: test/cbmc/proofs
