@@ -27,9 +27,15 @@
  * @file OtaStartTimer_FreeRTOS_harness.c
  * @brief Implements the proof harness for OtaStartTimer_FreeRTOS function.
  */
+
+/* LibC includes */
+#include <stdlib.h>
+
+/* Proof include */
+#include "ota_os_freertos.h"
+
 /*  FreeRTOS includes for OTA library. */
 #include "FreeRTOSConfig.h"
-#include "ota_os_freertos.h"
 
 void otaCallback( OtaTimerId_t otaTimerId )
 {

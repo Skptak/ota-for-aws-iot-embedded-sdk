@@ -27,10 +27,16 @@
  * @file OtaReceiveEvent_FreeRTOS_harness.c
  * @brief Implements the proof harness for OtaReceiveEvent_FreeRTOS function.
  */
-/*  FreeRTOS includes for OTA library. */
-#include "FreeRTOSConfig.h"
+
+/* LibC includes */
+#include <stdlib.h>
+
+/* Proof include */
 #include "ota_os_freertos.h"
 #include "ota_private.h"
+
+/*  FreeRTOS includes for OTA library. */
+#include "FreeRTOSConfig.h"
 
 void OtaReceiveEvent_FreeRTOS_harness()
 {
