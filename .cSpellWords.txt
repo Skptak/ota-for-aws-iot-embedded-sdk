@@ -355,6 +355,7 @@ LDRB
 LDRBS
 LDRNE
 LF
+LIBC
 LINKR
 LJMP
 LLIO
@@ -1118,6 +1119,7 @@ ldsr
 len
 lengh
 li
+libc
 lidt
 lovrs
 lpcount
