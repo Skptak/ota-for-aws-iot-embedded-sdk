@@ -28,6 +28,8 @@
  * @brief Includes the declaration of all the stubs required in the CBMC proofs.
  */
 
+#include "ota.h"
+
 /* Stub for initFileTransfer function. */
 OtaErr_t initFileTransferStub( OtaAgentContext_t * agent );
 
