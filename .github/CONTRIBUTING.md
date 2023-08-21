@@ -43,14 +43,18 @@ request, please ensure that:
 To send us a pull request, please:
 
 1. Fork the repository.
-2. Modify the source; please focus on the specific change you are contributing.
+1. Modify the source; please focus on the specific change you are contributing.
    If you also reformat all the code, it will be hard for us to focus on your
    change.
-3. Ensure local tests pass.
-4. Commit to your fork using clear commit messages.
-5. Send us a pull request, answering any default questions in the pull request
+1. Ensure that your contributions conform to the
+   [style guide](https://docs.aws.amazon.com/embedded-csdk/202011.00/lib-ref/docs/doxygen/output/html/guide_developer_styleguide.html).
+1. Format your code with `clang-format`, using the config available at
+   [.clang-format](../.clang-format).
+1. Ensure local tests pass.
+1. Commit to your fork using clear commit messages.
+1. Send us a pull request, answering any default questions in the pull request
    interface.
-6. Pay attention to any automated CI failures reported in the pull request, and
+1. Pay attention to any automated CI failures reported in the pull request, and
    stay involved in the conversation.
 
 GitHub provides additional document on

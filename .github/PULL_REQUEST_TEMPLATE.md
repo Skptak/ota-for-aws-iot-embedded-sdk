@@ -11,7 +11,7 @@
 <!--- Please refer to CONTRIBUTING.md for further guidelines -->
 
 - [ ] I have tested my changes. No regression in existing tests.
-- [ ] My code is formatted using Uncrustify.
+- [ ] My code is formatted using clang-format.
 - [ ] I have read and applied the rules stated in CONTRIBUTING.md.
 
 By submitting this pull request, I confirm that you can use, modify, copy, and
