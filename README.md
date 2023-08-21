@@ -77,7 +77,7 @@ To build unit tests, the submodule dependency of CMock is required. Use the
 following command to clone the submodule:
 
 ```
-git submodule update --checkout --init --recursive test/unit-test/CMock
+git submodule update --checkout --init --recursive test/unit-test/CMock source/dependency/coreJSON
 ```
 
 ### Platform Prerequisites
