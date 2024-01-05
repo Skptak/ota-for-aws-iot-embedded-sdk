@@ -129,9 +129,17 @@ Typedefs</h2></td></tr>
 
 <p>OTA update complete callback function typedef. </p>
 <p>The user must register a callback function when initializing the OTA Agent. This callback is used to notify the main application when the OTA update job is complete. Typically, it is used to reset the device after a successful update by calling <a class="el" href="ota_8c.html#a5169ba09148e7f5668a90e776e712f8b">OTA_ActivateNewImage</a> and may also be used to kick off user specified self tests during the Self Test phase.</p>
-<p>The callback function is called with one of the following arguments: </p><pre class="fragment"> OtaJobEventActivate           OTA update is authenticated and ready to
-</pre><p> activate. OtaJobEventFail OTA update failed. Unable to use this update. OtaJobEventStartTest OTA job is now ready for optional user self tests. OtaJobEventProcessed Event OTA got from user has been handled. OtaJobEventSelfTestFailed OTA update failed in self-test. OtaJobEventParseCustomJob OTA got an unknown job from cloud, need user to check if it's a custom job. OtaJobEventReceivedJob OTA event when a new valid job is received. OtaJobEventUpdateComplete OTA event when the update is completed. OtaJobEventNoActiveJob OTA event when no active job is pending.</p>
-<p>When OtaJobEventActivate is received, the job status details have been updated with the state as ready for Self Test. After reboot, the new firmware will (normally) be notified that it is in the Self Test phase via the callback and the application may then optionally run its own tests before committing the new image.</p>
+<p>The callback function is called with one of the following arguments: </p><pre class="fragment"> OtaJobEventActivate           OTA update is authenticated and ready to activate.
+ OtaJobEventFail               OTA update failed. Unable to use this update.
+ OtaJobEventStartTest          OTA job is now ready for optional user self tests.
+ OtaJobEventProcessed          Event OTA got from user has been handled.
+ OtaJobEventSelfTestFailed     OTA update failed in self-test.
+ OtaJobEventParseCustomJob     OTA got an unknown job from cloud, need user to check
+                               if it's a custom job.
+ OtaJobEventReceivedJob        OTA event when a new valid job is received.
+ OtaJobEventUpdateComplete     OTA event when the update is completed.
+ OtaJobEventNoActiveJob        OTA event when no active job is pending.
+</pre><p> When OtaJobEventActivate is received, the job status details have been updated with the state as ready for Self Test. After reboot, the new firmware will (normally) be notified that it is in the Self Test phase via the callback and the application may then optionally run its own tests before committing the new image.</p>
 <p>If the callback function is called with a result of OtaJobEventFail, the OTA update job has failed in some way and should be rejected.</p>
 <p>When OtaJobEventStartTest is received, the load is first boot after OTA. Users can set the image state to OtaImageStateAccepted if the load is verified.</p>
 <p>When OtaJobEventProcessed is received, the event (OtaAgentEventReceivedJobDocument) sent from user has been handled. User can free the buffer when receiving this callback.</p>
@@ -157,15 +165,18 @@ Typedefs</h2></td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">OtaJobEventStartTest   </td><td class="markdownTableBodyNone">NULL   </td><td class="markdownTableBodyNone">nothing    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">OtaJobEventProcessed   </td><td class="markdownTableBodyNone"><a class="el" href="struct_ota_event_data__t.html" title="The OTA Agent event and data structures.">OtaEventData_t</a>   </td><td class="markdownTableBodyNone">data buffer inputed from user by    </td></tr>
+<td class="markdownTableBodyNone">OtaJobEventProcessed   </td><td class="markdownTableBodyNone"><a class="el" href="struct_ota_event_data__t.html" title="The OTA Agent event and data structures.">OtaEventData_t</a>   </td><td class="markdownTableBodyNone">data buffer inputted from user by OTA_SignalEvent    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">OTA_SignalEvent OtaJobEventSelfTestFailed   </td><td class="markdownTableBodyNone">NULL   </td><td class="markdownTableBodyNone">nothing    </td></tr>
+<td class="markdownTableBodyNone">OtaJobEventSelfTestFailed   </td><td class="markdownTableBodyNone">NULL   </td><td class="markdownTableBodyNone">nothing    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">OtaJobEventParseCustomJob   </td><td class="markdownTableBodyNone"><a class="el" href="struct_ota_job_document__t.html" title="OTA Job document.">OtaJobDocument_t</a>   </td><td class="markdownTableBodyNone">pJobId, jobIdLength, pJobDocJson,    </td></tr>
+<td class="markdownTableBodyNone">OtaJobEventParseCustomJob   </td><td class="markdownTableBodyNone"><a class="el" href="struct_ota_job_document__t.html" title="OTA Job document.">OtaJobDocument_t</a>   </td><td class="markdownTableBodyNone">pJobId, jobIdLength, pJobDocJson, and jobDocLength    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">and jobDocLength OtaJobEventReceivedJob   </td><td class="markdownTableBodyNone"><a class="el" href="struct_ota_job_document__t.html" title="OTA Job document.">OtaJobDocument_t</a>   </td><td class="markdownTableBodyNone">pJobId, jobIdLength,   </td></tr>
+<td class="markdownTableBodyNone">OtaJobEventReceivedJob   </td><td class="markdownTableBodyNone"><a class="el" href="struct_ota_job_document__t.html" title="OTA Job document.">OtaJobDocument_t</a>   </td><td class="markdownTableBodyNone">pJobId, jobIdLength, pJobDocJson, jobDocLength, and fileTypeId    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">OtaJobEventUpdateComplete   </td><td class="markdownTableBodyNone"><a class="el" href="struct_ota_job_document__t.html" title="OTA Job document.">OtaJobDocument_t</a>   </td><td class="markdownTableBodyNone">status, reason and subReason    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">OtaJobEventNoActiveJob   </td><td class="markdownTableBodyNone">NULL   </td><td class="markdownTableBodyNone">nothing   </td></tr>
 </table>
-<p>pJobDocJson, jobDocLength, and fileTypeId OtaJobEventUpdateComplete|OtaJobDocument_t|status, reason and subReason OtaJobEventNoActiveJob|NULL|nothing </p>
 
 </div>
 </div>
